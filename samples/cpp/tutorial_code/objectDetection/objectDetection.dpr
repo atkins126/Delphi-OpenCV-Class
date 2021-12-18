@@ -1,3 +1,24 @@
+(*
+ This file is part of Delphi-OpenCV-Class project.
+ https://github.com/Laex/Delphi-OpenCV-Class
+
+ It is subject to the license terms in the LICENSE file found in the top-level directory
+ of this distribution and at https://www.apache.org/licenses/LICENSE-2.0.txt
+
+Copyright 2021, Laentir Valetov, laex@bk.ru
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*)
 program objectDetection;
 
 {$APPTYPE CONSOLE}
@@ -5,8 +26,9 @@ program objectDetection;
 
 uses
   System.SysUtils,
-  CVResource,
-  opencv_world;
+  cpp.utils,
+  cv.resource,
+  cv.opencv;
 
 Var
   (* * Global variables *)
@@ -18,13 +40,15 @@ procedure detectAndDisplay(frame: TMat);
 Var
   frame_gray: TMat;
   // n: Int64;
+  // R:TRect;
 begin
   cvtColor(frame, frame_gray, COLOR_BGR2GRAY);
   equalizeHist(frame_gray, frame_gray);
 
   // -- Detect faces
   Var
-    faces: StdVectorRect;
+    faces: Vector<TRect>;
+
   face_cascade.detectMultiScale(frame_gray, faces);
 
   // n := faces.size;
@@ -33,6 +57,8 @@ begin
   begin
     Var
       center: TPoint := Point(faces[i].x + faces[i].width div 2, faces[i].y + faces[i].height div 2);
+
+      // R:=faces[i];
     ellipse(frame, center, size(faces[i].width div 2, faces[i].height div 2), 0, 0, 360, Scalar(255, 0, 255), 4);
 
     // Mat faceROI = frame_gray(faces[i]);
@@ -41,7 +67,8 @@ begin
 
       // -- In each face, detect eyes
     Var
-      eyes: StdVectorRect;
+      eyes: Vector<TRect>;
+
     eyes_cascade.detectMultiScale(faceROI, eyes);
 
     for Var j: Integer := 0 to eyes.size() - 1 do
@@ -73,11 +100,11 @@ begin
 
     // String face_cascade_name = samples::findFile( parser.get<String>("face_cascade"));
     Var
-      face_cascade_name: CvStdString := OprnCVHaar + 'haarcascade_frontalface_alt.xml';
+      face_cascade_name: CppString := OprnCVHaar + 'haarcascade_frontalface_alt.xml';
 
       // String eyes_cascade_name = samples::findFile( parser.get<String>("eyes_cascade"));
     Var
-      eyes_cascade_name: CvStdString := OprnCVHaar + 'haarcascade_eye_tree_eyeglasses.xml';
+      eyes_cascade_name: CppString := OprnCVHaar + 'haarcascade_eye_tree_eyeglasses.xml';
 
       // -- 1. Load the cascades
     if (not face_cascade.load(face_cascade_name)) then
@@ -121,7 +148,10 @@ begin
     end;
   except
     on E: Exception do
+    begin
       Writeln(E.ClassName, ': ', E.Message);
+      Readln;
+    end;
   end;
 
 end.

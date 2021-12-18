@@ -32,6 +32,8 @@ Test/
 # Delphi compiler-generated binaries (safe to delete)
 *.exe
 *.dll
+!opencv_delphi454.dll
+!opencv_delphi454d.dll
 *.bpl
 *.bpi
 *.dcp
@@ -67,10 +69,10 @@ __recovery/
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
 
-# Resource from OpenCV
-resource/*.jpg
-resource/*.png
-
+# Resource
+*.jpg
+*.png
+*.avi
 # opencv_delphi
 x64/
 .vs/

@@ -1,3 +1,24 @@
+(*
+ This file is part of Delphi-OpenCV-Class project.
+ https://github.com/Laex/Delphi-OpenCV-Class
+
+ It is subject to the license terms in the LICENSE file found in the top-level directory
+ of this distribution and at https://www.apache.org/licenses/LICENSE-2.0.txt
+
+Copyright 2021, Laentir Valetov, laex@bk.ru
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*)
 program drawing;
 
 {$APPTYPE CONSOLE}
@@ -5,8 +26,9 @@ program drawing;
 
 uses
   System.SysUtils,
-  CVResource,
-  opencv_world;
+  cpp.utils,
+  cv.resource,
+  cv.opencv;
 
 const
   EXIT_FAILURE = 1;
@@ -25,7 +47,7 @@ end;
 
 Var
   pt: array [0 .. 1, 0 .. 2] of TPoint;
-  ppt: array [0 .. 1] of pPoint;
+  ppt: array [0 .. 1] of ^TPoint;
   npt: array [0 .. 1] of Int;
 
 begin
@@ -33,7 +55,7 @@ begin
     help;
 
     Var
-      wndname: CvStdString := 'Drawing Demo';
+      wndname: CppString := 'Drawing Demo';
     Var
       NUMBER: Int := 100;
     Var
@@ -218,7 +240,7 @@ begin
         Halt(0);
     end;
     Var
-      textsize: TSize := getTextSize('OpenCV forever!', Int(FONT_HERSHEY_COMPLEX), 3, 5, nil);
+      textsize: TSize := getTextSize('OpenCV forever!', FONT_HERSHEY_COMPLEX, 3, 5, nil);
 
     Var
       org: TPoint := Point((width - textsize.width) div 2, (height - textsize.height) div 2);

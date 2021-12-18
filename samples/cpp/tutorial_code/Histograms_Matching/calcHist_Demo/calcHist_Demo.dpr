@@ -1,3 +1,24 @@
+(*
+  This file is part of Delphi-OpenCV-Class project.
+  https://github.com/Laex/Delphi-OpenCV-Class
+
+  It is subject to the license terms in the LICENSE file found in the top-level directory
+  of this distribution and at https://www.apache.org/licenses/LICENSE-2.0.txt
+
+  Copyright 2021, Laentir Valetov, laex@bk.ru
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*)
 program calcHist_Demo;
 
 {$APPTYPE CONSOLE}
@@ -5,8 +26,9 @@ program calcHist_Demo;
 
 uses
   System.SysUtils,
-  CVResource,
-  opencv_world;
+  cpp.utils,
+  cv.resource,
+  cv.opencv;
 
 const
   EXIT_FAILURE = 1;
@@ -35,7 +57,7 @@ begin
 
     // ! [Separate the image in 3 places ( B, G and R )]
     Var
-      bgr_planes: StdVectorMat; // vector<Mat> bgr_planes;
+      bgr_planes: Vector<TMat>; // vector<Mat> bgr_planes;
 
     split(src, bgr_planes); // ! [Separate the image in 3 places ( B, G and R )]
 
@@ -54,14 +76,11 @@ begin
 
       // ! [Compute the histograms]
     Var
-      b_hist: TMat;
-    Var
-      g_hist: TMat;
-    Var
-      r_hist: TMat;
-    calcHist(@bgr_planes[0], 1, nil, TMat.Mat(), b_hist, 1, @histSize, @histRange[0], uniform, accumulate);
-    calcHist(@bgr_planes[1], 1, nil, TMat.Mat(), g_hist, 1, @histSize, @histRange[0], uniform, accumulate);
-    calcHist(@bgr_planes[2], 1, nil, TMat.Mat(), r_hist, 1, @histSize, @histRange[0], uniform, accumulate);
+      b_hist, g_hist, r_hist: TMat;
+
+    calcHist(bgr_planes[0], 1, nil, TMat.Mat(), b_hist, 1, @histSize, @histRange[0], uniform, accumulate);
+    calcHist(bgr_planes[1], 1, nil, TMat.Mat(), g_hist, 1, @histSize, @histRange[0], uniform, accumulate);
+    calcHist(bgr_planes[2], 1, nil, TMat.Mat(), r_hist, 1, @histSize, @histRange[0], uniform, accumulate);
     // ! [Compute the histograms]
 
     // ! [Draw the histograms for B, G and R]
@@ -73,7 +92,7 @@ begin
       bin_w: int := cvRound(hist_w / histSize);
 
     Var
-      histImage: TMat := TMat.Create(hist_h, hist_w, CV_8UC3, Scalar(0, 0, 0));
+      histImage: TMat := TMat.Mat(hist_h, hist_w, CV_8UC3, Scalar(0, 0, 0));
       // ! [Draw the histograms for B, G and R]
 
       // ! [Normalize the result to ( 0, histImage.rows )]
