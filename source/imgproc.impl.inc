@@ -1,31 +1,29 @@
-(*
-  This file is part of Delphi-OpenCV-Class project.
-  https://github.com/Laex/Delphi-OpenCV-Class
+  (*
+    This file is part of Delphi-OpenCV-Class project.
+    https://github.com/Laex/Delphi-OpenCV-Class
 
-  It is subject to the license terms in the LICENSE file found in the top-level directory
-  of this distribution and at https://www.apache.org/licenses/LICENSE-2.0.txt
+    It is subject to the license terms in the LICENSE file found in the top-level directory
+    of this distribution and at https://www.apache.org/licenses/LICENSE-2.0.txt
 
-  Copyright 2021, Laentir Valetov, laex@bk.ru
+    Copyright 2021, Laentir Valetov, laex@bk.ru
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-*)
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+  *)
 
-{$ifdef OPENCV_IMGPROC_HPP}
+{$IFDEF OPENCV_IMGPROC_HPP}
 
-procedure putText( const img: TInputOutputArray; const text: String; org: TPoint;
-                   fontFace: HersheyFonts; fontScale: double; color: TScalar;
-                   thickness: Int = 1; lineType: LineTypes = LINE_8;
-                   bottomLeftOrigin: BOOL = false);
+procedure putText(const img: TInputOutputArray; const text: String; org: TPoint; fontFace: HersheyFonts; fontScale: double; color: TScalar; thickness: Int = 1; lineType: LineTypes = LINE_8;
+  bottomLeftOrigin: BOOL = false);
 begin
   putText(img, CppString(text), org, Int(fontFace), fontScale, color, thickness, Int(lineType), bottomLeftOrigin);
 end;
@@ -193,6 +191,11 @@ begin
   createHanningWindow(dst, UInt64(winSize), &type);
 end;
 
+function threshold(const Src: TInputArray; const dst: TOutputArray; thresh, maxVal: double; &type: ThresholdTypes): double;
+begin
+  Result := threshold(Src,dst,thresh, maxVal,Int(&type));
+end;
+
 function phaseCorrelate(const src1: TInputArray; const src2: TInputArray; const window: TInputArray { = noArray() }; Var response: double { = 0 } ): TPoint2d;
 begin
   Result := phaseCorrelate(src1, src2, window, @response);
@@ -251,6 +254,85 @@ begin
   drawContours(image, contours, contourIdx, color, thickness, lineType, TInputArray.noArray);
 end;
 
-{$i 'imgproc/segmentation.impl.inc'}
+  { TSubdiv2D }
 
+class operator TSubdiv2D.Initialize(out Dest: TSubdiv2D);
+begin
+  constructor_Subdiv2D(Dest);
+end;
+
+class operator TSubdiv2D.Finalize(var Dest: TSubdiv2D);
+begin
+  destructor_Subdiv2D(Dest);
+end;
+
+class operator TSubdiv2D.assign(var Dest: TSubdiv2D; const [ref] Src: TSubdiv2D);
+begin
+  operator_assign_Subdiv2D(Dest, Src);
+end;
+
+procedure TSubdiv2D.getTriangleList(const triangleList: vector<TVec6f>);
+begin
+  getTriangleList_Subdiv2D(Self, triangleList);
+end;
+
+function TSubdiv2D.locate(const pt: TPoint2f; Var edge: Int; Var vertex: Int): Int;
+begin
+  Result := locale_Subdiv2D(Self, pt, edge, vertex);
+end;
+
+function TSubdiv2D.edgeOrg(edge: Int; var orgpt: TPoint2f): Int;
+begin
+  Result := edgeOrg_Subdiv2D(Self, edge, orgpt);
+end;
+
+function TSubdiv2D.edgeDst(edge: Int; var dstpt: TPoint2f): Int;
+begin
+  Result := edgeDst_Subdiv2D(Self, edge, dstpt);
+end;
+
+function TSubdiv2D.getEdge(edge: Int; nextEdgeType: Int): Int;
+begin
+  Result := getEdge_Subdiv2D(Self, edge, nextEdgeType);
+end;
+
+procedure TSubdiv2D.getVoronoiFacetList(const idx: vector<Int>; const facetList: vector<vector<TPoint2f>>; const facetCenters: vector<TPoint2f>);
+begin
+  getVoronoiFacetList_Subdiv2D(Self, idx, facetList, facetCenters);
+end;
+
+class function TSubdiv2D.Subdiv2D(const rect: TRect): TSubdiv2D;
+begin
+  constructor_Subdiv2D(Result, rect);
+end;
+
+class operator TSubdiv2D.Implicit(const r: TRect): TSubdiv2D;
+begin
+  Result := TSubdiv2D.Subdiv2D(r);
+end;
+
+function TSubdiv2D.insert(const pt: TPoint2f): Int;
+begin
+  Result := insert_Subdiv2D(Self, pt);
+end;
+
+procedure morphologyEx( const Src: TInputArray;
+                        const dst: TOutputArray;
+                        op: MorphTypes;
+                        const kernel: TInputArray;
+                        const anchor: TPoint;
+                        iterations: Int = 1;
+                        borderType: BorderTypes = BORDER_CONSTANT);
+begin
+  morphologyEx(Src, dst, op, kernel, anchor, iterations, borderType, morphologyDefaultBorderValue());
+end;
+procedure morphologyEx( const Src: TInputArray;
+                        const dst: TOutputArray;
+                        op: MorphTypes;
+                        const kernel: TInputArray);
+begin
+  morphologyEx(Src, dst, op, kernel, Point(-1, -1));
+end;
+
+{$I 'imgproc/segmentation.impl.inc'}
 {$ENDIF}

@@ -20,8 +20,7 @@
   limitations under the License.
 *)
 
-{$ifdef OPENCV_VIDEOIO_HPP}
-
+{$IFDEF OPENCV_VIDEOIO_HPP}
 { TVideoCapture }
 
 function TVideoCapture.&set(propId: VideoCaptureProperties; Value: double): BOOL;
@@ -29,17 +28,14 @@ begin
   Result := set_VideoCapture(Self, Int(propId), Value);
 end;
 
-class operator TVideoCapture.assign(var Dest: TVideoCapture;
-
-  const [ref] Src: TVideoCapture);
+class operator TVideoCapture.assign(var Dest: TVideoCapture; const [ref] Src: TVideoCapture);
 begin
   Move(Src, Dest, SizeOf(Dest));
   if Src.isOpened then
     FillChar((@Src.Dummy)^, SizeOf(Dest.Dummy), 0);
 end;
 
-class operator TVideoCapture.Finalize(
-  var Dest: TVideoCapture);
+class operator TVideoCapture.Finalize(var Dest: TVideoCapture);
 begin
   destructor_VideoCapture(Dest);
 end;
@@ -64,6 +60,11 @@ begin
   Result.open(index);
 end;
 
+class function TVideoCapture.Capture(const index: Int; const apiPreference: VideoCaptureAPIs = CAP_ANY): TVideoCapture;
+begin
+  Result.open(index, apiPreference);
+end;
+
 class operator TVideoCapture.Initialize(out Dest: TVideoCapture);
 begin
   constructor_VideoCapture(Dest);
@@ -76,22 +77,53 @@ end;
 
 function TVideoCapture.open(const filename: String; const apiPreference: VideoCaptureAPIs; const params: Vector<Int>): BOOL;
 begin
-  Result := open_VideoCapture(Self, filename, Int(apiPreference), params);
+  try
+    Result := open_VideoCapture(Self, filename, Int(apiPreference), params);
+  except
+    Result := False;
+  end;
 end;
 
 function TVideoCapture.open(const filename: String; const apiPreference: VideoCaptureAPIs): BOOL;
 begin
-  Result := open_VideoCapture(Self, filename, Int(apiPreference));
+  try
+    Result := open_VideoCapture(Self, filename, Int(apiPreference));
+  except
+    Result := False;
+  end;
+end;
+
+function TVideoCapture.open(const index: Int; const apiPreference: VideoCaptureAPIs; const params:vector<int>): BOOL;
+begin
+  try
+    Result := open_VideoCapture(Self, index, apiPreference, params);
+  except
+    Result := False;
+  end;
 end;
 
 function TVideoCapture.open(const index: Int; const apiPreference: VideoCaptureAPIs): BOOL;
 begin
-  Result := open_VideoCapture(Self, index, Int(apiPreference));
+  try
+    Result := open_VideoCapture(Self, index, Int(apiPreference));
+  except
+    Result := False;
+  end;
 end;
 
 function TVideoCapture.read(const image: TOutputArray): BOOL;
 begin
   Result := read_VideoCapture(Self, image);
+end;
+
+function TVideoCapture.grab(): BOOL;
+begin
+  Result := grab_VideoCapture(Self);
+end;
+
+function TVideoCapture.retrieve(const image: TOutputArray; flag: Int = 0): BOOL;
+begin
+  Result := retrieve_VideoCapture(Self, image, flag);
 end;
 
 procedure TVideoCapture.release;
@@ -143,7 +175,5 @@ procedure TVideoWriter.write(const image: TInputArray);
 begin
   write_VideoWriter(Self, image);
 end;
-
-
 
 {$ENDIF}

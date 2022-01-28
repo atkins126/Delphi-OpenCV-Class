@@ -249,7 +249,11 @@ function borderInterpolate(p: int; len: int; borderType: int): int; external ope
     ?copyMakeBorder@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@HHHHHAEBV?$Scalar_@N@1@@Z
     void cv::copyMakeBorder(class cv::_InputArray const &,class cv::_OutputArray const &,int,int,int,int,int,class cv::Scalar_<double> const &)
   }
-procedure copyMakeBorder(const src: TInputArray; const dst: TOutputArray; top, bottom, left, right, borderType: int; const value: TScalar { = Scalar() } ); overload; external opencv_world_dll
+procedure copyMakeBorder( const src: TInputArray;
+                          const dst: TOutputArray;
+                          top, bottom, left, right: int;
+                          borderType: borderTypes;
+                          const value: TScalar { = Scalar() } ); overload; external opencv_world_dll
 {$IFDEF DEBUG}
   name '?copyMakeBorder@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@HHHHHAEBV?$Scalar_@N@1@@Z'
 {$ELSE}
@@ -257,7 +261,8 @@ procedure copyMakeBorder(const src: TInputArray; const dst: TOutputArray; top, b
 {$ENDIF}
 {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
-procedure copyMakeBorder(const src: TInputArray; const dst: TOutputArray; top, bottom, left, right, borderType: int); overload;
+procedure copyMakeBorder(const src: TInputArray; const dst: TOutputArray; top, bottom, left, right: int;
+                          borderType: borderTypes); overload;
 {$IFDEF USE_INLINE}inline; {$ENDIF}
   (* * @brief Calculates the per-element sum of two arrays or an array and a scalar.
 
@@ -3454,7 +3459,7 @@ name '?Mahalanobis@cv@@YANAEBV_InputArray@1@00@Z'
 ?dft@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@HH@Z
 void cv::dft(class cv::_InputArray const &,class cv::_OutputArray const &,int,int)
 }
-procedure dft(const src:TInputArray;const dst:TOutputArray; flags :int= 0; nonzeroRows :int= 0);
+procedure dft(const src:TInputArray; const dst:TOutputArray; flags :int= 0; nonzeroRows :int= 0);
 overload; external opencv_world_dll
 {$IFDEF DEBUG}
 name '?dft@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@HH@Z'
@@ -3668,15 +3673,15 @@ name '?getOptimalDFTSize@cv@@YAHH@Z'
        , the constructor uses the above default value instead to avoid the
        singular random number sequence, consisting of all zeros.
        *)
-       class operator Initialize(out Dest: TRNG); // RNG();
+       // RNG();
+       class operator Initialize(out Dest: TRNG);
     private
      {$HINTS OFF}
      state: UInt64; // UInt64 state;
      // BOOL operator==(const RNG & other)  const;
      {$HINTS ON}
     end;
- function theRNG:TRNG;
-overload; external opencv_world_dll
+ function theRNG:TRNG; overload; external opencv_world_dll
 {$IFDEF DEBUG}
 name '?theRNG@cv@@YAAEAVRNG@1@XZ'
 {$ELSE}
@@ -3697,8 +3702,7 @@ name '?theRNG@cv@@YAAEAVRNG@1@XZ'
 ?setRNGSeed@cv@@YAXH@Z
 void cv::setRNGSeed(int)
 }
-procedure setRNGSeed(seed:int);
-overload; external opencv_world_dll
+procedure setRNGSeed(seed:int); overload; external opencv_world_dll
 {$IFDEF DEBUG}
 name '?setRNGSeed@cv@@YAXH@Z'
 {$ELSE}
@@ -3750,7 +3754,7 @@ name '?randu@cv@@YAXAEBV_InputOutputArray@1@AEBV_InputArray@1@1@Z'
  ?randn@cv@@YAXAEBV_InputOutputArray@1@AEBV_InputArray@1@1@Z
  void cv::randn(class cv::_InputOutputArray const &,class cv::_InputArray const &,class cv::_InputArray const &)
  }
-procedure randn(const dst:TInputOutputArray;const mean:TInputArray;const stddev:TInputArray);
+procedure randn(const dst:TInputOutputArray; const mean:TInputArray; const stddev:TInputArray);
 overload; external opencv_world_dll
 {$IFDEF DEBUG}
 name '?randn@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@AEBV_InputArray@31@1@Z'
@@ -4257,9 +4261,11 @@ Type
      (* @overload *)
      // operator short();
      (* @overload *)
-   class operator Implicit(const p: TRNG): unsigned; {$IFDEF USE_INLINE}inline; {$ENDIF} // operator unsigned();
+     // operator unsigned();
+   class operator Implicit(const rng: TRNG): unsigned; {$IFDEF USE_INLINE}inline; {$ENDIF}
      (* @overload *)
      // operator Int();
+   class operator Implicit(const rng:TRNG):int; {$IFDEF USE_INLINE}inline; {$ENDIF}
      (* @overload *)
      // operator float();
      (* @overload *)

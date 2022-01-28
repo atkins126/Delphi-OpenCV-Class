@@ -30,6 +30,7 @@ Uses
    System.Math,
 {$IFDEF USE_TYPEINFO}
    System.TypInfo,
+   System.Rtti,
 {$ENDIF}
    cpp.utils;
 
@@ -75,7 +76,7 @@ Uses
 {$I photo.inc}
 {$ENDIF}
 {$IFDEF HAVE_OPENCV_STITCHING}
-{.$I stitching.inc}
+{$I stitching.inc}
 {$ENDIF}
 {$IFDEF HAVE_OPENCV_VIDEO}
 {$I video.inc}
@@ -122,7 +123,7 @@ implementation
 {$I photo.impl.inc}
 {$ENDIF}
 {$IFDEF HAVE_OPENCV_STITCHING}
-{.$I stitching.impl.inc}
+{$I stitching.impl.inc}
 {$ENDIF}
 {$IFDEF HAVE_OPENCV_VIDEO}
 {$I video.impl.inc}
@@ -136,4 +137,3 @@ initialization
 {$I core.init.inc}
 
 end.
-

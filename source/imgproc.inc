@@ -977,264 +977,285 @@ public:
 //! @addtogroup imgproc_subdiv2d
 //! @{
 
-//class CV_EXPORTS_W Subdiv2D
-//{
-//public:
-//    (** Subdiv2D point location cases *)
-//    enum { PTLOC_ERROR        = -2, //!< Point location error
-//           PTLOC_OUTSIDE_RECT = -1, //!< Point outside the subdivision bounding rect
-//           PTLOC_INSIDE       = 0, //!< Point inside some facet
-//           PTLOC_VERTEX       = 1, //!< Point coincides with one of the subdivision vertices
-//           PTLOC_ON_EDGE      = 2  //!< Point on some edge
-//         };
-//
-//    (** Subdiv2D edge type navigation (see: getEdge()) *)
-//    enum { NEXT_AROUND_ORG   = 0x00,
-//           NEXT_AROUND_DST   = 0x22,
-//           PREV_AROUND_ORG   = 0x11,
-//           PREV_AROUND_DST   = 0x33,
-//           NEXT_AROUND_LEFT  = 0x13,
-//           NEXT_AROUND_RIGHT = 0x31,
-//           PREV_AROUND_LEFT  = 0x20,
-//           PREV_AROUND_RIGHT = 0x02
-//         };
-//
-//    (** creates an empty Subdiv2D object.
-//    To create a new empty Delaunay subdivision you need to use the #initDelaunay function.
-//     *)
+ TVertex = record
+
+ end;
+ TQuadEdge = record
+
+ end;
+
+ TSubdiv2D = record
+ public const
+    (** Subdiv2D point location cases *)
+           PTLOC_ERROR        = -2; //!< Point location error
+           PTLOC_OUTSIDE_RECT = -1; //!< Point outside the subdivision bounding rect
+           PTLOC_INSIDE       = 0; //!< Point inside some facet
+           PTLOC_VERTEX       = 1; //!< Point coincides with one of the subdivision vertices
+           PTLOC_ON_EDGE      = 2;  //!< Point on some edge
+
+ public const
+    (** Subdiv2D edge type navigation (see: getEdge()) *)
+           NEXT_AROUND_ORG   = $00;
+           NEXT_AROUND_DST   = $22;
+           PREV_AROUND_ORG   = $11;
+           PREV_AROUND_DST   = $33;
+           NEXT_AROUND_LEFT  = $13;
+           NEXT_AROUND_RIGHT = $31;
+           PREV_AROUND_LEFT  = $20;
+           PREV_AROUND_RIGHT = $02;
+ public
+    (** creates an empty Subdiv2D object.
+    To create a new empty Delaunay subdivision you need to use the #initDelaunay function.
+     *)
 //    CV_WRAP Subdiv2D();
-//
-//    (** @overload
-//
-//    @param rect Rectangle that includes all of the 2D points that are to be added to the subdivision.
-//
-//    The function creates an empty Delaunay subdivision where 2D points can be added using the function
-//    insert() . All of the points to be added must be within the specified rectangle, otherwise a runtime
-//    error is raised.
-//     *)
+    class operator Initialize(out Dest: TSubdiv2D);
+    class operator Finalize(var Dest: TSubdiv2D);
+    class operator assign(var Dest: TSubdiv2D; const [ref] Src: TSubdiv2D); {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+    (** @overload
+
+    @param rect Rectangle that includes all of the 2D points that are to be added to the subdivision.
+
+    The function creates an empty Delaunay subdivision where 2D points can be added using the function
+    insert() . All of the points to be added must be within the specified rectangle, otherwise a runtime
+    error is raised.
+     *)
 //    CV_WRAP Subdiv2D(Rect rect);
-//
-//    (** @brief Creates a new empty Delaunay subdivision
-//
-//    @param rect Rectangle that includes all of the 2D points that are to be added to the subdivision.
-//
-//     *)
+    class function Subdiv2D(const rect:TRect): TSubdiv2D; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    class operator Implicit(const r: TRect): TSubdiv2D;{$IFDEF USE_INLINE}inline; {$ENDIF}
+
+    (** @brief Creates a new empty Delaunay subdivision
+
+    @param rect Rectangle that includes all of the 2D points that are to be added to the subdivision.
+
+     *)
 //    CV_WRAP void initDelaunay(Rect rect);
-//
-//    (** @brief Insert a single point into a Delaunay triangulation.
-//
-//    @param pt Point to insert.
-//
-//    The function inserts a single point into a subdivision and modifies the subdivision topology
-//    appropriately. If a point with the same coordinates exists already, no new point is added.
-//    @returns the ID of the point.
-//
-//    @note If the point is outside of the triangulation specified rect a runtime error is raised.
-//     *)
+
+    (** @brief Insert a single point into a Delaunay triangulation.
+
+    @param pt Point to insert.
+
+    The function inserts a single point into a subdivision and modifies the subdivision topology
+    appropriately. If a point with the same coordinates exists already, no new point is added.
+    @returns the ID of the point.
+
+    @note If the point is outside of the triangulation specified rect a runtime error is raised.
+     *)
 //    CV_WRAP int insert(Point2f pt);
-//
-//    (** @brief Insert multiple points into a Delaunay triangulation.
-//
-//    @param ptvec Points to insert.
-//
-//    The function inserts a vector of points into a subdivision and modifies the subdivision topology
-//    appropriately.
-//     *)
+    function insert(const pt:TPoint2f):int; {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+    (** @brief Insert multiple points into a Delaunay triangulation.
+
+    @param ptvec Points to insert.
+
+    The function inserts a vector of points into a subdivision and modifies the subdivision topology
+    appropriately.
+     *)
 //    CV_WRAP void insert(const std::vector<Point2f>& ptvec);
-//
-//    (** @brief Returns the location of a point within a Delaunay triangulation.
-//
-//    @param pt Point to locate.
-//    @param edge Output edge that the point belongs to or is located to the right of it.
-//    @param vertex Optional output vertex the input point coincides with.
-//
-//    The function locates the input point within the subdivision and gives one of the triangle edges
-//    or vertices.
-//
-//    @returns an integer which specify one of the following five cases for point location:
-//    -  The point falls into some facet. The function returns #PTLOC_INSIDE and edge will contain one of
-//       edges of the facet.
-//    -  The point falls onto the edge. The function returns #PTLOC_ON_EDGE and edge will contain this edge.
-//    -  The point coincides with one of the subdivision vertices. The function returns #PTLOC_VERTEX and
-//       vertex will contain a pointer to the vertex.
-//    -  The point is outside the subdivision reference rectangle. The function returns #PTLOC_OUTSIDE_RECT
-//       and no pointers are filled.
-//    -  One of input arguments is invalid. A runtime error is raised or, if silent or "parent" error
-//       processing mode is selected, #PTLOC_ERROR is returned.
-//     *)
+
+    (** @brief Returns the location of a point within a Delaunay triangulation.
+
+    @param pt Point to locate.
+    @param edge Output edge that the point belongs to or is located to the right of it.
+    @param vertex Optional output vertex the input point coincides with.
+
+    The function locates the input point within the subdivision and gives one of the triangle edges
+    or vertices.
+
+    @returns an integer which specify one of the following five cases for point location:
+    -  The point falls into some facet. The function returns #PTLOC_INSIDE and edge will contain one of
+       edges of the facet.
+    -  The point falls onto the edge. The function returns #PTLOC_ON_EDGE and edge will contain this edge.
+    -  The point coincides with one of the subdivision vertices. The function returns #PTLOC_VERTEX and
+       vertex will contain a pointer to the vertex.
+    -  The point is outside the subdivision reference rectangle. The function returns #PTLOC_OUTSIDE_RECT
+       and no pointers are filled.
+    -  One of input arguments is invalid. A runtime error is raised or, if silent or "parent" error
+       processing mode is selected, #PTLOC_ERROR is returned.
+     *)
 //    CV_WRAP int locate(Point2f pt, CV_OUT int& edge, CV_OUT int& vertex);
-//
-//    (** @brief Finds the subdivision vertex closest to the given point.
-//
-//    @param pt Input point.
-//    @param nearestPt Output subdivision vertex point.
-//
-//    The function is another function that locates the input point within the subdivision. It finds the
-//    subdivision vertex that is the closest to the input point. It is not necessarily one of vertices
-//    of the facet containing the input point, though the facet (located using locate() ) is used as a
-//    starting point.
-//
-//    @returns vertex ID.
-//     *)
+    function locate(const pt:TPoint2f;Var edge:int;Var vertex:int):int; {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+    (** @brief Finds the subdivision vertex closest to the given point.
+
+    @param pt Input point.
+    @param nearestPt Output subdivision vertex point.
+
+    The function is another function that locates the input point within the subdivision. It finds the
+    subdivision vertex that is the closest to the input point. It is not necessarily one of vertices
+    of the facet containing the input point, though the facet (located using locate() ) is used as a
+    starting point.
+
+    @returns vertex ID.
+     *)
 //    CV_WRAP int findNearest(Point2f pt, CV_OUT Point2f* nearestPt = 0);
-//
-//    (** @brief Returns a list of all edges.
-//
-//    @param edgeList Output vector.
-//
-//    The function gives each edge as a 4 numbers vector, where each two are one of the edge
-//    vertices. i.e. org_x = v[0], org_y = v[1], dst_x = v[2], dst_y = v[3].
-//     *)
+
+    (** @brief Returns a list of all edges.
+
+    @param edgeList Output vector.
+
+    The function gives each edge as a 4 numbers vector, where each two are one of the edge
+    vertices. i.e. org_x = v[0], org_y = v[1], dst_x = v[2], dst_y = v[3].
+     *)
 //    CV_WRAP void getEdgeList(CV_OUT std::vector<Vec4f>& edgeList) const;
-//
-//    (** @brief Returns a list of the leading edge ID connected to each triangle.
-//
-//    @param leadingEdgeList Output vector.
-//
-//    The function gives one edge ID for each triangle.
-//     *)
+
+    (** @brief Returns a list of the leading edge ID connected to each triangle.
+
+    @param leadingEdgeList Output vector.
+
+    The function gives one edge ID for each triangle.
+     *)
 //    CV_WRAP void getLeadingEdgeList(CV_OUT std::vector<int>& leadingEdgeList) const;
-//
-//    (** @brief Returns a list of all triangles.
-//
-//    @param triangleList Output vector.
-//
-//    The function gives each triangle as a 6 numbers vector, where each two are one of the triangle
-//    vertices. i.e. p1_x = v[0], p1_y = v[1], p2_x = v[2], p2_y = v[3], p3_x = v[4], p3_y = v[5].
-//     *)
+
+    (** @brief Returns a list of all triangles.
+
+    @param triangleList Output vector.
+
+    The function gives each triangle as a 6 numbers vector, where each two are one of the triangle
+    vertices. i.e. p1_x = v[0], p1_y = v[1], p2_x = v[2], p2_y = v[3], p3_x = v[4], p3_y = v[5].
+     *)
 //    CV_WRAP void getTriangleList(CV_OUT std::vector<Vec6f>& triangleList) const;
-//
-//    (** @brief Returns a list of all Voronoi facets.
-//
-//    @param idx Vector of vertices IDs to consider. For all vertices you can pass empty vector.
-//    @param facetList Output vector of the Voronoi facets.
-//    @param facetCenters Output vector of the Voronoi facets center points.
-//
-//     *)
+    procedure getTriangleList(const triangleList:vector<TVec6f>); {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+    (** @brief Returns a list of all Voronoi facets.
+
+    @param idx Vector of vertices IDs to consider. For all vertices you can pass empty vector.
+    @param facetList Output vector of the Voronoi facets.
+    @param facetCenters Output vector of the Voronoi facets center points.
+
+     *)
 //    CV_WRAP void getVoronoiFacetList(const std::vector<int>& idx, CV_OUT std::vector<std::vector<Point2f> >& facetList,
 //                                     CV_OUT std::vector<Point2f>& facetCenters);
-//
-//    (** @brief Returns vertex location from vertex ID.
-//
-//    @param vertex vertex ID.
-//    @param firstEdge Optional. The first edge ID which is connected to the vertex.
-//    @returns vertex (x,y)
-//
-//     *)
+    procedure getVoronoiFacetList(const idx:vector<int>; const facetList:vector<vector<TPoint2f>>;
+                                     const facetCenters:vector<TPoint2f>); {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+    (** @brief Returns vertex location from vertex ID.
+
+    @param vertex vertex ID.
+    @param firstEdge Optional. The first edge ID which is connected to the vertex.
+    @returns vertex (x,y)
+
+     *)
 //    CV_WRAP Point2f getVertex(int vertex, CV_OUT int* firstEdge = 0) const;
-//
-//    (** @brief Returns one of the edges related to the given edge.
-//
-//    @param edge Subdivision edge ID.
-//    @param nextEdgeType Parameter specifying which of the related edges to return.
-//    The following values are possible:
-//    -   NEXT_AROUND_ORG next around the edge origin ( eOnext on the picture below if e is the input edge)
-//    -   NEXT_AROUND_DST next around the edge vertex ( eDnext )
-//    -   PREV_AROUND_ORG previous around the edge origin (reversed eRnext )
-//    -   PREV_AROUND_DST previous around the edge destination (reversed eLnext )
-//    -   NEXT_AROUND_LEFT next around the left facet ( eLnext )
-//    -   NEXT_AROUND_RIGHT next around the right facet ( eRnext )
-//    -   PREV_AROUND_LEFT previous around the left facet (reversed eOnext )
-//    -   PREV_AROUND_RIGHT previous around the right facet (reversed eDnext )
-//
-//    ![sample output](pics/quadedge.png)
-//
-//    @returns edge ID related to the input edge.
-//     *)
+
+    (** @brief Returns one of the edges related to the given edge.
+
+    @param edge Subdivision edge ID.
+    @param nextEdgeType Parameter specifying which of the related edges to return.
+    The following values are possible:
+    -   NEXT_AROUND_ORG next around the edge origin ( eOnext on the picture below if e is the input edge)
+    -   NEXT_AROUND_DST next around the edge vertex ( eDnext )
+    -   PREV_AROUND_ORG previous around the edge origin (reversed eRnext )
+    -   PREV_AROUND_DST previous around the edge destination (reversed eLnext )
+    -   NEXT_AROUND_LEFT next around the left facet ( eLnext )
+    -   NEXT_AROUND_RIGHT next around the right facet ( eRnext )
+    -   PREV_AROUND_LEFT previous around the left facet (reversed eOnext )
+    -   PREV_AROUND_RIGHT previous around the right facet (reversed eDnext )
+
+    ![sample output](pics/quadedge.png)
+
+    @returns edge ID related to the input edge.
+     *)
 //    CV_WRAP int getEdge( int edge, int nextEdgeType ) const;
-//
-//    (** @brief Returns next edge around the edge origin.
-//
-//    @param edge Subdivision edge ID.
-//
-//    @returns an integer which is next edge ID around the edge origin: eOnext on the
-//    picture above if e is the input edge).
-//     *)
+    function getEdge(edge:int; nextEdgeType:int):int; {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+    (** @brief Returns next edge around the edge origin.
+
+    @param edge Subdivision edge ID.
+
+    @returns an integer which is next edge ID around the edge origin: eOnext on the
+    picture above if e is the input edge).
+     *)
 //    CV_WRAP int nextEdge(int edge) const;
-//
-//    (** @brief Returns another edge of the same quad-edge.
-//
-//    @param edge Subdivision edge ID.
-//    @param rotate Parameter specifying which of the edges of the same quad-edge as the input
-//    one to return. The following values are possible:
-//    -   0 - the input edge ( e on the picture below if e is the input edge)
-//    -   1 - the rotated edge ( eRot )
-//    -   2 - the reversed edge (reversed e (in green))
-//    -   3 - the reversed rotated edge (reversed eRot (in green))
-//
-//    @returns one of the edges ID of the same quad-edge as the input edge.
-//     *)
+
+    (** @brief Returns another edge of the same quad-edge.
+
+    @param edge Subdivision edge ID.
+    @param rotate Parameter specifying which of the edges of the same quad-edge as the input
+    one to return. The following values are possible:
+    -   0 - the input edge ( e on the picture below if e is the input edge)
+    -   1 - the rotated edge ( eRot )
+    -   2 - the reversed edge (reversed e (in green))
+    -   3 - the reversed rotated edge (reversed eRot (in green))
+
+    @returns one of the edges ID of the same quad-edge as the input edge.
+     *)
 //    CV_WRAP int rotateEdge(int edge, int rotate) const;
 //    CV_WRAP int symEdge(int edge) const;
-//
-//    (** @brief Returns the edge origin.
-//
-//    @param edge Subdivision edge ID.
-//    @param orgpt Output vertex location.
-//
-//    @returns vertex ID.
-//     *)
+
+    (** @brief Returns the edge origin.
+
+    @param edge Subdivision edge ID.
+    @param orgpt Output vertex location.
+
+    @returns vertex ID.
+     *)
 //    CV_WRAP int edgeOrg(int edge, CV_OUT Point2f* orgpt = 0) const;
-//
-//    (** @brief Returns the edge destination.
-//
-//    @param edge Subdivision edge ID.
-//    @param dstpt Output vertex location.
-//
-//    @returns vertex ID.
-//     *)
+    function edgeOrg(edge:int; var orgpt:TPoint2f):Int; {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+    (** @brief Returns the edge destination.
+
+    @param edge Subdivision edge ID.
+    @param dstpt Output vertex location.
+
+    @returns vertex ID.
+     *)
 //    CV_WRAP int edgeDst(int edge, CV_OUT Point2f* dstpt = 0) const;
-//
-//protected:
-//    int newEdge();
-//    void deleteEdge(int edge);
-//    int newPoint(Point2f pt, bool isvirtual, int firstEdge = 0);
-//    void deletePoint(int vtx);
-//    void setEdgePoints( int edge, int orgPt, int dstPt );
-//    void splice( int edgeA, int edgeB );
-//    int connectEdges( int edgeA, int edgeB );
-//    void swapEdges( int edge );
-//    int isRightOf(Point2f pt, int edge) const;
-//    void calcVoronoi();
-//    void clearVoronoi();
-//    void checkSubdiv() const;
-//
-//    struct CV_EXPORTS Vertex
-//    {
-//        Vertex();
-//        Vertex(Point2f pt, bool isvirtual, int firstEdge=0);
-//        bool isvirtual() const;
-//        bool isfree() const;
-//
-//        int firstEdge;
-//        int type;
-//        Point2f pt;
-//    };
-//
-//    struct CV_EXPORTS QuadEdge
-//    {
-//        QuadEdge();
-//        QuadEdge(int edgeidx);
-//        bool isfree() const;
-//
-//        int next[4];
-//        int pt[4];
-//    };
-//
-//    //! All of the vertices
-//    std::vector<Vertex> vtx;
-//    //! All of the edges
-//    std::vector<QuadEdge> qedges;
-//    int freeQEdge;
-//    int freePoint;
-//    bool validGeometry;
-//
-//    int recentEdge;
-//    //! Top left corner of the bounding rect
-//    Point2f topLeft;
-//    //! Bottom right corner of the bounding rect
-//    Point2f bottomRight;
-//};
+    function edgeDst(edge:int; var dstpt:TPoint2f):Int; {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+private
+    {$HINTS OFF}
+(*
+    int newEdge();
+    void deleteEdge(int edge);
+    int newPoint(Point2f pt, bool isvirtual, int firstEdge = 0);
+    void deletePoint(int vtx);
+    void setEdgePoints( int edge, int orgPt, int dstPt );
+    void splice( int edgeA, int edgeB );
+    int connectEdges( int edgeA, int edgeB );
+    void swapEdges( int edge );
+    int isRightOf(Point2f pt, int edge) const;
+    void calcVoronoi();
+    void clearVoronoi();
+    void checkSubdiv() const;
+
+    struct CV_EXPORTS Vertex
+    {
+        Vertex();
+        Vertex(Point2f pt, bool isvirtual, int firstEdge=0);
+        bool isvirtual() const;
+        bool isfree() const;
+
+        int firstEdge;
+        int type;
+        Point2f pt;
+    };
+
+    struct CV_EXPORTS QuadEdge
+    {
+        QuadEdge();
+        QuadEdge(int edgeidx);
+        bool isfree() const;
+
+        int next[4];
+        int pt[4];
+    };
+*)
+    //! All of the vertices
+    vtx:array[0..32-1] of byte; //std::vector<Vertex> vtx;
+    //! All of the edges
+    qedges: array[0..32-1] of byte;//std::vector<QuadEdge> qedges;
+    freeQEdge:int;
+    freePoint:int;
+    validGeometry:bool;
+
+    recentEdge:int;
+    //! Top left corner of the bounding rect
+    topLeft:TPoint2f;
+    //! Bottom right corner of the bounding rect
+    bottomRight:TPoint2f;
+    {$HINTS ON}
+end;
 
 //! @} imgproc_subdiv2d
 
@@ -1818,6 +1839,22 @@ applied. See #getDerivKernels for details.
 //CV_EXPORTS_W void Laplacian( InputArray src, OutputArray dst, int ddepth,
 //                             int ksize = 1, double scale = 1, double delta = 0,
 //                             int borderType = BORDER_DEFAULT );
+{
+3393
+?Laplacian@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@HHNNH@Z
+?Laplacian@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@HHNNH@Z
+void cv::Laplacian(class cv::_InputArray const &,class cv::_OutputArray const &,int,int,double,double,int)
+}
+procedure Laplacian(const src:TInputArray;const dst:TOutputArray; ddepth:int;
+                             ksize :int= 1; scale :double= 1; delta :double= 0;
+                             borderType :int= int(BORDER_DEFAULT));
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?Laplacian@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@HHNNH@Z'
+{$ELSE}
+  name '?Laplacian@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@HHNNH@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 //! @} imgproc_filter
 
@@ -2474,6 +2511,36 @@ successively: erode -> erode -> dilate -> dilate (and not erode -> dilate -> ero
 //                                Point anchor = Point(-1,-1), int iterations = 1,
 //                                int borderType = BORDER_CONSTANT,
 //                                const Scalar& borderValue = morphologyDefaultBorderValue() );
+{
+5687
+?morphologyEx@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@H0V?$Point_@H@1@HHAEBV?$Scalar_@N@1@@Z
+?morphologyEx@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@H0V?$Point_@H@1@HHAEBV?$Scalar_@N@1@@Z
+void cv::morphologyEx(class cv::_InputArray const &,class cv::_OutputArray const &,int,class cv::_InputArray const &,class cv::Point_<int>,int,int,class cv::Scalar_<double> const &)
+}
+procedure morphologyEx(const src:TInputArray;const dst:TOutputArray;
+                                op:MorphTypes;
+                                const kernel:TInputArray;
+                                const anchor :UInt64 {= Point(-1,-1)}; iterations :int {= 1};
+                                borderType :BorderTypes {= BORDER_CONSTANT};
+                                const borderValue :TScalar {= morphologyDefaultBorderValue()} );
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?morphologyEx@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@H0V?$Point_@H@1@HHAEBV?$Scalar_@N@1@@Z'
+{$ELSE}
+  name '?morphologyEx@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@H0V?$Point_@H@1@HHAEBV?$Scalar_@N@1@@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+procedure morphologyEx(const src:TInputArray;const dst:TOutputArray;
+                                op:MorphTypes;
+                                const kernel:TInputArray;
+                                const anchor :TPoint {= Point(-1,-1)}; iterations :int = 1;
+                                borderType :BorderTypes = BORDER_CONSTANT);
+overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+procedure morphologyEx(const src:TInputArray;const dst:TOutputArray;
+                                op:MorphTypes;
+                                const kernel:TInputArray);
+overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+
 
 //! @} imgproc_filter
 
@@ -3217,13 +3284,14 @@ types.
   ?threshold@cv@@YANAEBV_InputArray@1@AEBV_OutputArray@1@NNH@Z
   double cv::threshold(class cv::_InputArray const &,class cv::_OutputArray const &,double,double,int)
 }
-function threshold(const Src: TInputArray; const dst: TOutputArray; thresh, maxVal: double; &type: Int): double; external opencv_world_dll
+function threshold(const Src: TInputArray; const dst: TOutputArray; thresh, maxVal: double; &type: Int): double; overload; external opencv_world_dll
 {$IFDEF DEBUG}
   name '?threshold@cv@@YANAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@NNH@Z'
 {$ELSE}
   name '?threshold@cv@@YANAEBV_InputArray@1@AEBV_OutputArray@1@NNH@Z'
 {$ENDIF}
 {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+function threshold(const Src: TInputArray; const dst: TOutputArray; thresh, maxVal: double; &type: ThresholdTypes): double; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
 
 (** @brief Applies an adaptive threshold to an array.
 
@@ -3701,6 +3769,22 @@ mode==GC_EVAL .
 //CV_EXPORTS_W void grabCut( InputArray img, InputOutputArray mask, Rect rect,
 //                           InputOutputArray bgdModel, InputOutputArray fgdModel,
 //                           int iterCount, int mode = GC_EVAL );
+{
+5203
+?grabCut@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_InputOutputArray@31@V?$Rect_@H@1@11HH@Z
+?grabCut@cv@@YAXAEBV_InputArray@1@AEBV_InputOutputArray@1@V?$Rect_@H@1@11HH@
+Z	void cv::grabCut(class cv::_InputArray const &,class cv::_InputOutputArray const &,class cv::Rect_<int>,class cv::_InputOutputArray const &,class cv::_InputOutputArray const &,int,int)
+}
+procedure grabCut(const img:TInputArray;const mask:TInputOutputArray;const rect:TRect;
+                           const bgdModel:TInputOutputArray;const fgdModel:TInputOutputArray;
+                           iterCount:int; mode :GrabCutModes = GC_EVAL );
+external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?grabCut@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_InputOutputArray@31@V?$Rect_@H@1@11HH@Z'
+{$ELSE}
+  name '?grabCut@cv@@YAXAEBV_InputArray@1@AEBV_InputOutputArray@1@V?$Rect_@H@1@11HH@'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 //! @} imgproc_segmentation
 
@@ -3767,6 +3851,22 @@ the parameter is forced to 3 because a \f$3\times 3\f$ mask gives the same resul
 //CV_EXPORTS_AS(distanceTransformWithLabels) void distanceTransform( InputArray src, OutputArray dst,
 //                                     OutputArray labels, int distanceType, int maskSize,
 //                                     int labelType = DIST_LABEL_CCOMP );
+{
+4502
+?distanceTransform@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@1HHH@Z
+?distanceTransform@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@1HHH@Z
+void cv::distanceTransform(class cv::_InputArray const &,class cv::_OutputArray const &,class cv::_OutputArray const &,int,int,int)
+}
+procedure distanceTransform( const src:TInputArray;const dst:TOutputArray;
+                             const labels:TOutputArray; distanceType:DistanceTypes; maskSize:DistanceTransformMasks;
+                             labelType : DistanceTransformLabelTypes = DIST_LABEL_CCOMP );
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?distanceTransform@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@1HHH@Z'
+{$ELSE}
+  name '?distanceTransform@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@1HHH@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 (** @overload
 @param src 8-bit, single-channel (binary) source image.
@@ -3781,6 +3881,22 @@ the first variant of the function and distanceType == #DIST_L1.
 *)
 //CV_EXPORTS_W void distanceTransform( InputArray src, OutputArray dst,
 //                                     int distanceType, int maskSize, int dstType=CV_32F);
+{
+4503
+?distanceTransform@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@HHH@Z
+?distanceTransform@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@HHH@Z
+void cv::distanceTransform(class cv::_InputArray const &,class cv::_OutputArray const &,int,int,int)
+}
+procedure distanceTransform( const src:TInputArray;const dst:TOutputArray;
+                             distanceType:DistanceTypes; maskSize:DistanceTransformMasks;
+                             dstType:int = CV_32F);
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?distanceTransform@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@HHH@Z'
+{$ELSE}
+  name '?distanceTransform@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@HHH@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 (** @brief Fills a connected component with the given color.
 
@@ -3933,7 +4049,8 @@ channels is derived automatically from src and code.
   ?cvtColor@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@HH@Z
   void cv::cvtColor(class cv::_InputArray const &,class cv::_OutputArray const &,int,int)
 }
-procedure cvtColor(const Src: TInputArray; const dst: TOutputArray; code: Int; dstCn: Int = 0); overload; external opencv_world_dll
+procedure cvtColor(const Src: TInputArray; const dst: TOutputArray; code: Int; dstCn: Int = 0);
+overload; external opencv_world_dll
 {$IFDEF DEBUG}
   name '?cvtColor@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@HH@Z'
 {$ELSE}
@@ -4263,7 +4380,8 @@ procedure findContours(const image: TInputArray; const contours: TOutputArrayOfA
   ?findContours@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@HHV?$Point_@H@1@@Z
   void cv::findContours(class cv::_InputArray const &,class cv::_OutputArray const &,int,int,class cv::Point_<int>)
 }
-procedure findContours(const image: TInputArray; const contours: TOutputArrayOfArrays; mode: Int; method: Int; const offset: UInt64 = 0 { = Point() } ); overload; external opencv_world_dll
+procedure findContours(const image: TInputArray; const contours: TOutputArrayOfArrays; mode: Int; method: Int; const offset: UInt64 = 0 { = Point() } );
+overload; external opencv_world_dll
 {$IFDEF DEBUG}
   name '?findContours@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@HHV?$Point_@H@1@@Z'
 {$ELSE}
@@ -4300,6 +4418,22 @@ connected). Otherwise, it is not closed.
 //CV_EXPORTS_W void approxPolyDP( InputArray curve,
 //                                OutputArray approxCurve,
 //                                double epsilon, bool closed );
+{
+3558
+?approxPolyDP@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@N_N@Z
+?approxPolyDP@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@N_N@Z
+void cv::approxPolyDP(class cv::_InputArray const &,class cv::_OutputArray const &,double,bool)
+}
+procedure approxPolyDP( const curve:TInputArray;
+                        const approxCurve:TOutputArray;
+                        epsilon:double; closed:bool);
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?approxPolyDP@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@N_N@Z'
+{$ELSE}
+  name '?approxPolyDP@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@N_N@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 (** @brief Calculates a contour perimeter or a curve length.
 
@@ -4465,6 +4599,21 @@ https://www.learnopencv.com/convex-hull-using-opencv-in-python-and-c/
  *)
 //CV_EXPORTS_W void convexHull( InputArray points, OutputArray hull,
 //                              bool clockwise = false, bool returnPoints = true );
+{
+4058
+?convexHull@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@_N2@Z
+?convexHull@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@_N2@Z
+void cv::convexHull(class cv::_InputArray const &,class cv::_OutputArray const &,bool,bool)
+}
+procedure convexHull(const points:TInputArray;const hull:TOutputArray;
+                              clockwise :bool= false; returnPoints :bool= true );
+external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?convexHull@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@_N2@Z'
+{$ELSE}
+  name '?convexHull@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@_N2@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 (** @brief Finds the convexity defects of a contour.
 
@@ -4734,6 +4883,20 @@ An example using applyColorMap function
 @param colormap The colormap to apply, see #ColormapTypes
 *)
 //CV_EXPORTS_W void applyColorMap(InputArray src, OutputArray dst, int colormap);
+{
+3554
+?applyColorMap@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@H@Z
+?applyColorMap@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@H@Z
+void cv::applyColorMap(class cv::_InputArray const &,class cv::_OutputArray const &,int)
+}
+procedure applyColorMap(const src:TInputArray;const dst:TOutputArray; colormap:ColormapTypes); overload;
+external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?applyColorMap@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@H@Z'
+{$ELSE}
+  name '?applyColorMap@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@H@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 (** @brief Applies a user colormap on a given image.
 
@@ -4885,7 +5048,8 @@ mean that a filled circle is to be drawn.
   ?circle@cv@@YAXAEBV_InputOutputArray@1@V?$Point_@H@1@HAEBV?$Scalar_@N@1@HHH@Z
   void cv::circle(class cv::_InputOutputArray const &,class cv::Point_<int>,int,class cv::Scalar_<double> const &,int,int,int)
 }
-procedure circle(const img: TInputOutputArray; center: UInt64 { TPoint }; radius: Int; const color: TScalar; thickness: Int = 1; lineType: Int = Int(LINE_8); shift: Int = 0); overload;
+procedure circle( const img: TInputOutputArray; center: UInt64 { TPoint }; radius: Int;
+                  const color: TScalar; thickness: Int = 1; lineType: Int = Int(LINE_8); shift: Int = 0); overload;
   external opencv_world_dll
 {$IFDEF DEBUG}
   name '?circle@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@V?$Point_@H@1@HAEBV?$Scalar_@N@1@HHH@Z'
@@ -4893,7 +5057,8 @@ procedure circle(const img: TInputOutputArray; center: UInt64 { TPoint }; radius
   name '?circle@cv@@YAXAEBV_InputOutputArray@1@V?$Point_@H@1@HAEBV?$Scalar_@N@1@HHH@Z'
 {$ENDIF}
 {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
-procedure circle(const img: TInputOutputArray; const center: TPoint; radius: Int; const color: TScalar; thickness: Int = 1; lineType: LineTypes = LINE_8; shift: Int = 0); overload;
+procedure circle( const img: TInputOutputArray; const center: TPoint; radius: Int;
+                  const color: TScalar; thickness: Int = 1; lineType: LineTypes = LINE_8; shift: Int = 0); overload;
 {$IFDEF USE_INLINE}inline; {$ENDIF}
 (** @brief Draws a simple or thick elliptic arc or fills an ellipse sector.
 
@@ -4989,7 +5154,8 @@ marker types are supported, see #MarkerTypes for more information.
   void cv::drawMarker(class cv::_InputOutputArray const &,class cv::Point_<int>,class cv::Scalar_<double> const &,int,int,int,int)
 }
 procedure drawMarker(const img: TInputOutputArray; position: UInt64 { TPoint }; const color: TScalar; markerType: Int = Int(MARKER_CROSS); markerSize: Int = 20; thickness: Int = 1;
-  line_type: Int = 8); overload; external opencv_world_dll
+  line_type: Int = 8);
+ overload; external opencv_world_dll
 {$IFDEF DEBUG}
   name '?drawMarker@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@V?$Point_@H@1@AEBV?$Scalar_@N@1@HHHH@Z'
 {$ELSE}
@@ -5018,12 +5184,43 @@ twice at the most (though, its top-most and/or the bottom edge could be horizont
 //CV_EXPORTS_W void fillConvexPoly(InputOutputArray img, InputArray points,
 //                                 const Scalar& color, int lineType = LINE_8,
 //                                 int shift = 0);
+{
+4709
+?fillConvexPoly@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@AEBV_InputArray@31@AEBV?$Scalar_@N@1@HH@Z
+?fillConvexPoly@cv@@YAXAEBV_InputOutputArray@1@AEBV_InputArray@1@AEBV?$Scalar_@N@1@HH@Z
+void cv::fillConvexPoly(class cv::_InputOutputArray const &,class cv::_InputArray const &,class cv::Scalar_<double> const &,int,int)
+}
+procedure fillConvexPoly(const img:TInputOutputArray;const points:TInputArray;
+                                 const color:TScalar; lineType :int = int(LINE_8);
+                                 shift :int = 0);
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?fillConvexPoly@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@AEBV_InputArray@31@AEBV?$Scalar_@N@1@HH@Z'
+{$ELSE}
+  name '?fillConvexPoly@cv@@YAXAEBV_InputOutputArray@1@AEBV_InputArray@1@AEBV?$Scalar_@N@1@HH@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 (** @overload *)
 //CV_EXPORTS void fillConvexPoly(InputOutputArray img, const Point* pts, int npts,
 //                               const Scalar& color, int lineType = LINE_8,
 //                               int shift = 0);
-
+{
+4710
+?fillConvexPoly@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@PEBV?$Point_@H@1@HAEBV?$Scalar_@N@1@HH@Z
+?fillConvexPoly@cv@@YAXAEBV_InputOutputArray@1@PEBV?$Point_@H@1@HAEBV?$Scalar_@N@1@HH@Z
+void cv::fillConvexPoly(class cv::_InputOutputArray const &,class cv::Point_<int> const *,int,class cv::Scalar_<double> const &,int,int)
+}
+procedure fillConvexPoly(const img:TInputOutputArray; const pts:pPoint; npts:int;
+                               const color:TScalar; lineType :int= int(LINE_8);
+                               shift :int = 0);
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?fillConvexPoly@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@PEBV?$Point_@H@1@HAEBV?$Scalar_@N@1@HH@Z'
+{$ELSE}
+  name '?fillConvexPoly@cv@@YAXAEBV_InputOutputArray@1@PEBV?$Point_@H@1@HAEBV?$Scalar_@N@1@HH@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 (** @example samples/cpp/tutorial_code/ImgProc/basic_drawing/Drawing_1.cpp
 An example using drawing functions
 Check @ref tutorial_random_generator_and_text "the corresponding tutorial" for more details
@@ -5052,18 +5249,21 @@ parts), and so forth.
 //                         const Scalar& color, int lineType = LINE_8, int shift = 0,
 //                         Point offset = Point() );
 
-procedure fillPoly(const img: TInputOutputArray; const pts: pPoint; const npts: pInt; ncontours: Int; const color: TScalar; lineType: Int = Int(LINE_8); shift: Int = 0;
-  offset: UInt64 { TPoint } { = Point() } = 0); overload; external opencv_world_dll
+procedure fillPoly( const img: TInputOutputArray; const pts: pPoint; const npts: pInt; ncontours: Int;
+                    const color: TScalar; lineType: Int = Int(LINE_8); shift: Int = 0;
+                    offset: UInt64 { TPoint } { = Point() } = 0); overload; external opencv_world_dll
 {$IFDEF DEBUG}
   name '?fillPoly@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@PEAPEBV?$Point_@H@1@PEBHHAEBV?$Scalar_@N@1@HHV41@@Z'
 {$ELSE}
   name '?fillPoly@cv@@YAXAEBV_InputOutputArray@1@PEAPEBV?$Point_@H@1@PEBHHAEBV?$Scalar_@N@1@HHV31@@Z'
 {$ENDIF}
 {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
-procedure fillPoly(const img: TInputOutputArray; const pts: pPoint; const npts: pInt; const ncontours: Int; const color: TScalar; const lineType: LineTypes { = LINE_8 }; const shift: Int { = 0 };
-  const offset: TPoint); overload;
+procedure fillPoly( const img: TInputOutputArray; const pts: pPoint; const npts: pInt; const ncontours: Int;
+                    const color: TScalar; const lineType: LineTypes { = LINE_8 }; const shift: Int { = 0 };
+                    const offset: TPoint); overload;
 {$IFDEF USE_INLINE}inline; {$ENDIF}
-procedure fillPoly(const img: TInputOutputArray; const pts: pPoint; const npts: pInt; const ncontours: Int; const color: TScalar; const lineType: LineTypes = LINE_8; const shift: Int = 0); overload;
+procedure fillPoly( const img: TInputOutputArray; const pts: pPoint; const npts: pInt; const ncontours: Int;
+                    const color: TScalar; const lineType: LineTypes = LINE_8; const shift: Int = 0); overload;
 {$IFDEF USE_INLINE}inline; {$ENDIF}
 
 (** @brief Draws several polygonal curves.
@@ -5082,7 +5282,22 @@ The function cv::polylines draws one or more polygonal curves.
 //CV_EXPORTS_W void polylines(InputOutputArray img, InputArrayOfArrays pts,
 //                            bool isClosed, const Scalar& color,
 //                            int thickness = 1, int lineType = LINE_8, int shift = 0 );
-
+{
+5854
+?polylines@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@AEBV_InputArray@31@_NAEBV?$Scalar_@N@1@HHH@Z
+?polylines@cv@@YAXAEBV_InputOutputArray@1@AEBV_InputArray@1@_NAEBV?$Scalar_@N@1@HHH@Z
+void cv::polylines(class cv::_InputOutputArray const &,class cv::_InputArray const &,bool,class cv::Scalar_<double> const &,int,int,int)
+}
+procedure polylines(const img:TInputOutputArray; const pts:TInputArrayOfArrays;
+                            isClosed:bool; const color:TScalar;
+                            thickness :int= 1; lineType :int= int(LINE_8); shift :int= 0 );
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?polylines@cv@@YAXAEBV_InputOutputArray@debug_build_guard@1@AEBV_InputArray@31@_NAEBV?$Scalar_@N@1@HHH@Z'
+{$ELSE}
+  name '?polylines@cv@@YAXAEBV_InputOutputArray@1@AEBV_InputArray@1@_NAEBV?$Scalar_@N@1@HHH@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 (** @overload *)
 //CV_EXPORTS void polylines(InputOutputArray img, const Point* const* pts, const int* npts,
 //                          int ncontours, bool isClosed, const Scalar& color,
@@ -5498,5 +5713,6 @@ Point LineIterator::pos() const
 
 {$i 'imgproc/segmentation.inc'}
 {$i 'external/opencv.IntelligentScissorsMB.import.inc'}
+{$i 'external/opencv.Subdiv2D.import.inc'}
 
 {$endif}

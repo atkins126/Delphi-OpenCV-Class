@@ -353,7 +353,7 @@ TSize_<T> = record
   TSize2d =TSize_<double>;
   TSize   =TSize2i       ;
 
-function size(const _width, _height: Int): TSize; {$IFDEF USE_INLINE}inline; {$ENDIF}
+function size(const _width:Int=0;const _height: Int=0): TSize; {$IFDEF USE_INLINE}inline; {$ENDIF}
 
 (*
 template<typename _Tp> class DataType< Size_<_Tp> >
@@ -448,11 +448,14 @@ TRect_<T: record > = record
     // #endif
     // ! the top-left corner
     // Point_<_Tp> tl() const;
+    function tl:TPoint_<T>; {$IFDEF USE_INLINE}inline; {$ENDIF}
     // ! the bottom-right corner
     // Point_<_Tp> br() const;
+    function br:TPoint_<T>; {$IFDEF USE_INLINE}inline; {$ENDIF}
 
     // ! size (width, height) of the rectangle
     // Size_<_Tp> size() const;
+    function size:TSize_<T>; {$IFDEF USE_INLINE}inline; {$ENDIF}
     // ! area (width*height) of the rectangle
     // _Tp area() const;
     function area: T; {$IFDEF USE_INLINE}inline; {$ENDIF}
@@ -467,6 +470,8 @@ TRect_<T: record > = record
 
     class function Rect(const _x: T; _y: T; _width: T; _height: T): TRect_<T>; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
     class operator BitwiseAnd(const a, b: TRect_<T>): TRect_<T>;
+    class operator Implicit(const a: TArray<T>): TRect_<T>;
+//    class operator Implicit(const r: TRect): TRect_<T>;
   public
     x: T;      // !< x coordinate of the top-left corner
     y: T;      // !< y coordinate of the top-left corner
@@ -474,12 +479,13 @@ TRect_<T: record > = record
     height: T; // !< height of the rectangle
   end;
 
-  TRect2i     =TRect_<int>   ;
-  TRect2f     =TRect_<float> ;
-  TRect2d     =TRect_<double>;
-  TRect       =TRect2i       ;
+  TRect2i     = TRect_<int>   ;
+  TRect2f     = TRect_<float> ;
+  TRect2d     = TRect_<double>;
+  TRect       = TRect2i       ;
 
-function Rect(const _x: Int; _y: Int; _width: Int; _height: Int): TRect; {$IFDEF USE_INLINE}inline; {$ENDIF}
+function Rect(const _x: Int; _y: Int; _width: Int; _height: Int): TRect; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+function Rect(const pt1,pt2:TPoint): TRect; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
 
 (*
 template<typename _Tp> class DataType< Rect_<_Tp> >
@@ -607,19 +613,22 @@ custom processing, you will probably have to check and handle it explicitly:
     }
 @endcode
 *)
+
+   TRange = record
+   public
+//    Range();
+//    Range(int _start, int _end);
+//    int size() const;
+//    bool empty() const;
+//    static Range all();
+    class function all:TRange; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
+   private
+    start, &end:int;
+end;
+function Range(_start:int; _end:int):TRange; {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+
 (*
-class CV_EXPORTS Range
-{
-public:
-    Range();
-    Range(int _start, int _end);
-    int size() const;
-    bool empty() const;
-    static Range all();
-
-    int start, end;
-};
-
 template<> class DataType<Range>
 {
 public:
@@ -684,6 +693,7 @@ TScalar = record
     // //! returns true iff v1 == v2 == v3 == 0
     // bool isReal() const;
     class operator Implicit(const v0: double): TScalar; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    class operator Implicit(const a: TArray<double>): TScalar; {$IFDEF USE_INLINE}inline; {$ENDIF}
     property val[const index: integer]: double read getval write setval; default;
   end;
 

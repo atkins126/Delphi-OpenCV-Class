@@ -40,10 +40,17 @@ function Constructor_Mat(const Obj: TMat;const a: TMat;const b: TRect):pMat; ove
 // public: __cdecl cv::Mat::Mat(class cv::Mat const & __ptr64,class std::vector<class cv::Range,class std::allocator<class cv::Range> > const & __ptr64) __ptr64
 // procedure Constructor_Mat(const Obj: pMat; a: pMat; b: TCVectorPointer); overload;
 // external opencv_world_dll name '??0Mat@cv@@QEAA@AEBV01@AEBV?$vector@VRange@cv@@V?$allocator@VRange@cv@@@std@@@std@@@Z' {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
-// ??0Mat@cv@@QEAA@AEBV01@AEBVRange@1@1@Z
-// public: __cdecl cv::Mat::Mat(class cv::Mat const & __ptr64,class cv::Range const & __ptr64,class cv::Range const & __ptr64) __ptr64
-// procedure Constructor_Mat(const Obj: pMat; a: pMat; b: TCVRangePointer; c: TCVRangePointer); overload; external opencv_world_dll name '??0Mat@cv@@QEAA@AEBV01@AEBVRange@1@1@Z'
-// {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+
+{
+760
+??0Mat@cv@@QEAA@AEBV01@AEBVRange@1@1@Z
+??0Mat@cv@@QEAA@AEBV01@AEBVRange@1@1@Z
+cv::Mat::Mat(class cv::Mat const &,class cv::Range const &,class cv::Range const &)
+}
+procedure Constructor_Mat(Var Obj: TMat; const m: TMat; const rowRange: TRange; const colRange:TRange);
+overload; external opencv_world_dll name '??0Mat@cv@@QEAA@AEBV01@AEBVRange@1@1@Z'
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+
 // ??0Mat@cv@@QEAA@AEBV01@PEBVRange@1@@Z
 // public: __cdecl cv::Mat::Mat(class cv::Mat const & __ptr64,class cv::Range const * __ptr64) __ptr64
 // procedure Constructor_Mat(const Obj: pMat; a: pMat; b: TCVRangePointer); overload; external opencv_world_dll name '??0Mat@cv@@QEAA@AEBV01@PEBVRange@1@@Z'
@@ -103,7 +110,10 @@ function Constructor_Mat(const Obj: TMat; a: UInt64{TSize}; b: int; c: Pointer; 
 {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 // ??0Mat@cv@@QEAA@XZ
 // public: __cdecl cv::Mat::Mat(void) __ptr64
-function Constructor_Mat(const Obj: TMat):pMat; overload; external opencv_world_dll name '??0Mat@cv@@QEAA@XZ' {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+//function Constructor_Mat(const Obj: TMat):pMat;
+procedure Constructor_Mat(Var Obj: TMat);
+overload; external opencv_world_dll name '??0Mat@cv@@QEAA@XZ' {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+
 // ??1Mat@cv@@QEAA@XZ
 // public: __cdecl cv::Mat::~Mat(void) __ptr64
 function Destructor_Mat(const Obj: TMat):pMat; overload; external opencv_world_dll name '??1Mat@cv@@QEAA@XZ' {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
@@ -163,7 +173,8 @@ procedure copySize_Mat(const Obj: TMat;const a: TMat); overload; external opencv
   ?copyTo@Mat@cv@@QEBAXAEBV_OutputArray@2@@Z
   void cv::Mat::copyTo(class cv::_OutputArray const &)
 }
-procedure copyTo_Mat(const Obj: TMat;const a: TOutputArray); overload; external opencv_world_dll
+procedure copyTo_Mat(const Obj: TMat;const a: TOutputArray);
+overload; external opencv_world_dll
 {$IFDEF DEBUG}
   name '?copyTo@Mat@cv@@QEBAXAEBV_OutputArray@debug_build_guard@2@@Z'
 {$ELSE}
@@ -331,7 +342,7 @@ procedure reserveBuffer_Mat(const Obj: TMat; a: UInt64); overload; external open
 function reshape_Mat(const Obj: TMat; a: int; b: int): TMat; overload; external opencv_world_dll name '?reshape@Mat@cv@@QEBA?AV12@HH@Z' {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 // ?reshape@Mat@cv@@QEBA?AV12@HHPEBH@Z
 // public: class cv::Mat __cdecl cv::Mat::reshape(int,int,int const * __ptr64)const __ptr64
-function reshape_Mat(const Obj: TMat; a: int; b: int; var c: Int): TMat; overload; external opencv_world_dll name '?reshape@Mat@cv@@QEBA?AV12@HHPEBH@Z'
+function reshape_Mat(const Obj: TMat; a: int; b: int; const c: pInt): TMat; overload; external opencv_world_dll name '?reshape@Mat@cv@@QEBA?AV12@HHPEBH@Z'
 {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 // ?resize@Mat@cv@@QEAAX_K@Z
 // public: void __cdecl cv::Mat::resize(unsigned __int64) __ptr64
@@ -350,16 +361,36 @@ function row_Mat(const Obj: TMat; a: int): TMat; overload; external opencv_world
 // ?rowRange@Mat@cv@@QEBA?AV12@HH@Z
 // public: class cv::Mat __cdecl cv::Mat::rowRange(int,int)const __ptr64
 function rowRange_Mat(const Obj: TMat; a: int; b: int): TMat; overload; external opencv_world_dll name '?rowRange@Mat@cv@@QEBA?AV12@HH@Z' {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
-// ?setDefaultAllocator@Mat@cv@@SAXPEAVMatAllocator@2@@Z
-// public: static void __cdecl cv::Mat::setDefaultAllocator(class cv::MatAllocator * __ptr64)
+(*
+ ?setDefaultAllocator@Mat@cv@@SAXPEAVMatAllocator@2@@Z
+ public: static void __cdecl cv::Mat::setDefaultAllocator(class cv::MatAllocator * __ptr64)
+*)
 // procedure setDefaultAllocator_Mat(const Obj: pMat; a: pCVMatAllocator); overload; external opencv_world_dll name '?setDefaultAllocator@Mat@cv@@SAXPEAVMatAllocator@2@@Z'
 // {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
-// ?setTo@Mat@cv@@QEAAAEAV12@AEBV_InputArray@2@0@Z
-// public: class cv::Mat & __ptr64 __cdecl cv::Mat::setTo(class cv::_InputArray const & __ptr64,class cv::_InputArray const & __ptr64) __ptr64
-// function setTo_Mat(const Obj: pMat; a: TCVPointer; b: TCVPointer): pMat; overload; external opencv_world_dll name '?setTo@Mat@cv@@QEAAAEAV12@AEBV_InputArray@2@0@Z'
-// {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
-// ?step1@Mat@cv@@QEBA_KH@Z
-// public: unsigned __int64 __cdecl cv::Mat::step1(int)const __ptr64
+(*
+ ?setTo@Mat@cv@@QEAAAEAV12@AEBV_InputArray@2@0@Z
+ public: class cv::Mat & __ptr64 __cdecl cv::Mat::setTo(class cv::_InputArray const & __ptr64,class cv::_InputArray const & __ptr64) __ptr64
+ function setTo_Mat(const Obj: pMat; a: TCVPointer; b: TCVPointer): pMat; overload; external opencv_world_dll name '?setTo@Mat@cv@@QEAAAEAV12@AEBV_InputArray@2@0@Z'
+ {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+*)
+{
+6417
+?setTo@Mat@cv@@QEAAAEAV12@AEBV_InputArray@debug_build_guard@2@0@Z
+?setTo@Mat@cv@@QEAAAEAV12@AEBV_InputArray@2@0@Z
+class cv::Mat & cv::Mat::setTo(class cv::_InputArray const &,class cv::_InputArray const &)
+}
+function setTo_Mat(const Obj: TMat; const value:TInputArray;const mask:TInputArray):pMat;
+overload; external opencv_world_dll
+{$IFDEF DEBUG}
+  name '?setTo@Mat@cv@@QEAAAEAV12@AEBV_InputArray@debug_build_guard@2@0@Z'
+{$ELSE}
+  name '?setTo@Mat@cv@@QEAAAEAV12@AEBV_InputArray@2@0@Z'
+{$ENDIF}
+{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+{
+ ?step1@Mat@cv@@QEBA_KH@Z
+ public: unsigned __int64 __cdecl cv::Mat::step1(int)const __ptr64
+}
 function step1_Mat(const Obj: TMat; a: int): UInt64; overload; external opencv_world_dll name '?step1@Mat@cv@@QEBA_KH@Z' {$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 // ?t@Mat@cv@@QEBA?AVMatExpr@2@XZ
 // public: class cv::MatExpr __cdecl cv::Mat::t(void)const __ptr64

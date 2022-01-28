@@ -81,6 +81,60 @@
         <Projects Include="cpp\lkdemo\lkdemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="cpp\delaunay2\delaunay2.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\laplace\cv_laplace.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\peopledetect\peopledetect.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\inpaint\cvinpaint.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\morphology2\morphology2.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\contours2\contours2.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\distrans\distrans.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\opencv_version\opencv_version.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\stitching\stitching.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\grabcut\cvgrabcut.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\dft\cvdft.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\tutorial_code\HighGUI\BasicLinearTransformsTrackbar\BasicLinearTransformsTrackbar.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\tutorial_code\ImgTrans\CannyDetector_Demo\CannyDetector_Demo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\videocapture_realsense\videocapture_realsense.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\convexhull\cvconvexhull.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\neural_network\neural_network.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\videocapture_audio\videocapture_audio.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="cpp\videocapture_microphone\videocapture_microphone.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -323,14 +377,176 @@
     <Target Name="lkdemo:Make">
         <MSBuild Projects="cpp\lkdemo\lkdemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="delaunay2">
+        <MSBuild Projects="cpp\delaunay2\delaunay2.dproj"/>
+    </Target>
+    <Target Name="delaunay2:Clean">
+        <MSBuild Projects="cpp\delaunay2\delaunay2.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="delaunay2:Make">
+        <MSBuild Projects="cpp\delaunay2\delaunay2.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="cv_laplace">
+        <MSBuild Projects="cpp\laplace\cv_laplace.dproj"/>
+    </Target>
+    <Target Name="cv_laplace:Clean">
+        <MSBuild Projects="cpp\laplace\cv_laplace.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="cv_laplace:Make">
+        <MSBuild Projects="cpp\laplace\cv_laplace.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="peopledetect">
+        <MSBuild Projects="cpp\peopledetect\peopledetect.dproj"/>
+    </Target>
+    <Target Name="peopledetect:Clean">
+        <MSBuild Projects="cpp\peopledetect\peopledetect.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="peopledetect:Make">
+        <MSBuild Projects="cpp\peopledetect\peopledetect.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="cvinpaint">
+        <MSBuild Projects="cpp\inpaint\cvinpaint.dproj"/>
+    </Target>
+    <Target Name="cvinpaint:Clean">
+        <MSBuild Projects="cpp\inpaint\cvinpaint.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="cvinpaint:Make">
+        <MSBuild Projects="cpp\inpaint\cvinpaint.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="morphology2">
+        <MSBuild Projects="cpp\morphology2\morphology2.dproj"/>
+    </Target>
+    <Target Name="morphology2:Clean">
+        <MSBuild Projects="cpp\morphology2\morphology2.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="morphology2:Make">
+        <MSBuild Projects="cpp\morphology2\morphology2.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="contours2">
+        <MSBuild Projects="cpp\contours2\contours2.dproj"/>
+    </Target>
+    <Target Name="contours2:Clean">
+        <MSBuild Projects="cpp\contours2\contours2.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="contours2:Make">
+        <MSBuild Projects="cpp\contours2\contours2.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="distrans">
+        <MSBuild Projects="cpp\distrans\distrans.dproj"/>
+    </Target>
+    <Target Name="distrans:Clean">
+        <MSBuild Projects="cpp\distrans\distrans.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="distrans:Make">
+        <MSBuild Projects="cpp\distrans\distrans.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="opencv_version">
+        <MSBuild Projects="cpp\opencv_version\opencv_version.dproj"/>
+    </Target>
+    <Target Name="opencv_version:Clean">
+        <MSBuild Projects="cpp\opencv_version\opencv_version.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="opencv_version:Make">
+        <MSBuild Projects="cpp\opencv_version\opencv_version.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="stitching">
+        <MSBuild Projects="cpp\stitching\stitching.dproj"/>
+    </Target>
+    <Target Name="stitching:Clean">
+        <MSBuild Projects="cpp\stitching\stitching.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="stitching:Make">
+        <MSBuild Projects="cpp\stitching\stitching.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="cvgrabcut">
+        <MSBuild Projects="cpp\grabcut\cvgrabcut.dproj"/>
+    </Target>
+    <Target Name="cvgrabcut:Clean">
+        <MSBuild Projects="cpp\grabcut\cvgrabcut.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="cvgrabcut:Make">
+        <MSBuild Projects="cpp\grabcut\cvgrabcut.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="cvdft">
+        <MSBuild Projects="cpp\dft\cvdft.dproj"/>
+    </Target>
+    <Target Name="cvdft:Clean">
+        <MSBuild Projects="cpp\dft\cvdft.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="cvdft:Make">
+        <MSBuild Projects="cpp\dft\cvdft.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BasicLinearTransformsTrackbar">
+        <MSBuild Projects="cpp\tutorial_code\HighGUI\BasicLinearTransformsTrackbar\BasicLinearTransformsTrackbar.dproj"/>
+    </Target>
+    <Target Name="BasicLinearTransformsTrackbar:Clean">
+        <MSBuild Projects="cpp\tutorial_code\HighGUI\BasicLinearTransformsTrackbar\BasicLinearTransformsTrackbar.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicLinearTransformsTrackbar:Make">
+        <MSBuild Projects="cpp\tutorial_code\HighGUI\BasicLinearTransformsTrackbar\BasicLinearTransformsTrackbar.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CannyDetector_Demo">
+        <MSBuild Projects="cpp\tutorial_code\ImgTrans\CannyDetector_Demo\CannyDetector_Demo.dproj"/>
+    </Target>
+    <Target Name="CannyDetector_Demo:Clean">
+        <MSBuild Projects="cpp\tutorial_code\ImgTrans\CannyDetector_Demo\CannyDetector_Demo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CannyDetector_Demo:Make">
+        <MSBuild Projects="cpp\tutorial_code\ImgTrans\CannyDetector_Demo\CannyDetector_Demo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="videocapture_realsense">
+        <MSBuild Projects="cpp\videocapture_realsense\videocapture_realsense.dproj"/>
+    </Target>
+    <Target Name="videocapture_realsense:Clean">
+        <MSBuild Projects="cpp\videocapture_realsense\videocapture_realsense.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="videocapture_realsense:Make">
+        <MSBuild Projects="cpp\videocapture_realsense\videocapture_realsense.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="cvconvexhull">
+        <MSBuild Projects="cpp\convexhull\cvconvexhull.dproj"/>
+    </Target>
+    <Target Name="cvconvexhull:Clean">
+        <MSBuild Projects="cpp\convexhull\cvconvexhull.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="cvconvexhull:Make">
+        <MSBuild Projects="cpp\convexhull\cvconvexhull.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="neural_network">
+        <MSBuild Projects="cpp\neural_network\neural_network.dproj"/>
+    </Target>
+    <Target Name="neural_network:Clean">
+        <MSBuild Projects="cpp\neural_network\neural_network.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="neural_network:Make">
+        <MSBuild Projects="cpp\neural_network\neural_network.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="videocapture_audio">
+        <MSBuild Projects="cpp\videocapture_audio\videocapture_audio.dproj"/>
+    </Target>
+    <Target Name="videocapture_audio:Clean">
+        <MSBuild Projects="cpp\videocapture_audio\videocapture_audio.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="videocapture_audio:Make">
+        <MSBuild Projects="cpp\videocapture_audio\videocapture_audio.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="videocapture_microphone">
+        <MSBuild Projects="cpp\videocapture_microphone\videocapture_microphone.dproj"/>
+    </Target>
+    <Target Name="videocapture_microphone:Clean">
+        <MSBuild Projects="cpp\videocapture_microphone\videocapture_microphone.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="videocapture_microphone:Make">
+        <MSBuild Projects="cpp\videocapture_microphone\videocapture_microphone.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="AddingImages;Smoothing;Thresholdp;morph_lines_detection;objectDetection;calcHist_Demo;drawing;edge;cornerDetector_Demo;goodFeaturesToTrack_Demo;optical_flow;introduction_to_svm;cvdecolor;npr_demo;phase_corr;videocapture_basic;videocapture_image_sequence;dis_opticalflow;facedetect;segment_objects;video_write;facial_features;camshiftdemo;imgproc_segmentation;minarea;lkdemo"/>
+        <CallTarget Targets="AddingImages;Smoothing;Thresholdp;morph_lines_detection;objectDetection;calcHist_Demo;drawing;edge;cornerDetector_Demo;goodFeaturesToTrack_Demo;optical_flow;introduction_to_svm;cvdecolor;npr_demo;phase_corr;videocapture_basic;videocapture_image_sequence;dis_opticalflow;facedetect;segment_objects;video_write;facial_features;camshiftdemo;imgproc_segmentation;minarea;lkdemo;delaunay2;cv_laplace;peopledetect;cvinpaint;morphology2;contours2;distrans;opencv_version;stitching;cvgrabcut;cvdft;BasicLinearTransformsTrackbar;CannyDetector_Demo;videocapture_realsense;cvconvexhull;neural_network;videocapture_audio;videocapture_microphone"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="AddingImages:Clean;Smoothing:Clean;Thresholdp:Clean;morph_lines_detection:Clean;objectDetection:Clean;calcHist_Demo:Clean;drawing:Clean;edge:Clean;cornerDetector_Demo:Clean;goodFeaturesToTrack_Demo:Clean;optical_flow:Clean;introduction_to_svm:Clean;cvdecolor:Clean;npr_demo:Clean;phase_corr:Clean;videocapture_basic:Clean;videocapture_image_sequence:Clean;dis_opticalflow:Clean;facedetect:Clean;segment_objects:Clean;video_write:Clean;facial_features:Clean;camshiftdemo:Clean;imgproc_segmentation:Clean;minarea:Clean;lkdemo:Clean"/>
+        <CallTarget Targets="AddingImages:Clean;Smoothing:Clean;Thresholdp:Clean;morph_lines_detection:Clean;objectDetection:Clean;calcHist_Demo:Clean;drawing:Clean;edge:Clean;cornerDetector_Demo:Clean;goodFeaturesToTrack_Demo:Clean;optical_flow:Clean;introduction_to_svm:Clean;cvdecolor:Clean;npr_demo:Clean;phase_corr:Clean;videocapture_basic:Clean;videocapture_image_sequence:Clean;dis_opticalflow:Clean;facedetect:Clean;segment_objects:Clean;video_write:Clean;facial_features:Clean;camshiftdemo:Clean;imgproc_segmentation:Clean;minarea:Clean;lkdemo:Clean;delaunay2:Clean;cv_laplace:Clean;peopledetect:Clean;cvinpaint:Clean;morphology2:Clean;contours2:Clean;distrans:Clean;opencv_version:Clean;stitching:Clean;cvgrabcut:Clean;cvdft:Clean;BasicLinearTransformsTrackbar:Clean;CannyDetector_Demo:Clean;videocapture_realsense:Clean;cvconvexhull:Clean;neural_network:Clean;videocapture_audio:Clean;videocapture_microphone:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="AddingImages:Make;Smoothing:Make;Thresholdp:Make;morph_lines_detection:Make;objectDetection:Make;calcHist_Demo:Make;drawing:Make;edge:Make;cornerDetector_Demo:Make;goodFeaturesToTrack_Demo:Make;optical_flow:Make;introduction_to_svm:Make;cvdecolor:Make;npr_demo:Make;phase_corr:Make;videocapture_basic:Make;videocapture_image_sequence:Make;dis_opticalflow:Make;facedetect:Make;segment_objects:Make;video_write:Make;facial_features:Make;camshiftdemo:Make;imgproc_segmentation:Make;minarea:Make;lkdemo:Make"/>
+        <CallTarget Targets="AddingImages:Make;Smoothing:Make;Thresholdp:Make;morph_lines_detection:Make;objectDetection:Make;calcHist_Demo:Make;drawing:Make;edge:Make;cornerDetector_Demo:Make;goodFeaturesToTrack_Demo:Make;optical_flow:Make;introduction_to_svm:Make;cvdecolor:Make;npr_demo:Make;phase_corr:Make;videocapture_basic:Make;videocapture_image_sequence:Make;dis_opticalflow:Make;facedetect:Make;segment_objects:Make;video_write:Make;facial_features:Make;camshiftdemo:Make;imgproc_segmentation:Make;minarea:Make;lkdemo:Make;delaunay2:Make;cv_laplace:Make;peopledetect:Make;cvinpaint:Make;morphology2:Make;contours2:Make;distrans:Make;opencv_version:Make;stitching:Make;cvgrabcut:Make;cvdft:Make;BasicLinearTransformsTrackbar:Make;CannyDetector_Demo:Make;videocapture_realsense:Make;cvconvexhull:Make;neural_network:Make;videocapture_audio:Make;videocapture_microphone:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
