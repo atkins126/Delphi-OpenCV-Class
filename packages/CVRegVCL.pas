@@ -21,6 +21,8 @@
 *)
 unit CVRegVCL;
 
+{$I opt.inc}
+
 interface
 
 procedure Register;
@@ -38,7 +40,7 @@ uses
 {$i '../../source/core/version.inc'}
 
 const
-  PackageText = 'Delphi binding for OpenCV C++ classes';
+  PackageText = 'Delphi binding for OpenCV';
 
 resourcestring
   resPackageName = PackageText+' '+CV_VERSION;
