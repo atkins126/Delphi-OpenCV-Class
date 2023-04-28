@@ -27,8 +27,8 @@
 //#  warning Detected Apple 'NO' macro definition, it can cause build conflicts. Please, include this header before any Apple headers.
 //#endif
 
-{$i 'core.inc'}
-{$i 'core/cuda.inc'}
+{$IF not defined(OPENCV_CORE_HPP)}{$I 'core.inc'}{$ifend}
+{$if not defined(OPENCV_CORE_CUDA_HPP)}{$i 'core/cuda.inc'}{$IFEND}
 
 //namespace cv {
 //namespace detail {

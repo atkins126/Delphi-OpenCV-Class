@@ -20,7 +20,8 @@
   limitations under the License.
 *)
 
-{$ifdef OPENCV_CORE_MATX_HPP}
+{$if defined(OPENCV_CORE_MATX_HPP) and (not defined(OPENCV_CORE_MATX_HPP_IMPL))}
+{$DEFINE OPENCV_CORE_MATX_HPP_IMPL}
 
 function TVec3b.getItem(const index: integer): uchar;
 begin
@@ -42,6 +43,18 @@ begin
   _Data[index] := Value;
 end;
 
-{$I 'core/saturate.impl.inc'}
+function Vec3b(const a,b,c:uchar):TVec3b;
+begin
+  Result := [a,b,c];
+end;
 
-{$endif}
+{ TMatSize }
+
+function TMatSize.getValues(const Index:Integer):Int;
+begin
+ Result := p[Index];
+end;
+
+{$IF not defined(OPENCV_CORE_SATURATE_HPP_IMPL)}{$I 'core/saturate.impl.inc'}{$ifend}
+
+{$ifend}

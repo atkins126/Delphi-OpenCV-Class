@@ -20,12 +20,15 @@
   limitations under the License.
 *)
 
-{$IFDEF OPENCV_VIDEOIO_HPP}
+{$IF defined(OPENCV_VIDEOIO_HPP) and (not defined(OPENCV_VIDEOIO_HPP_IMPL))}
+{$DEFINE OPENCV_VIDEOIO_HPP_IMPL}
 { TVideoCapture }
 
 function TVideoCapture.&set(propId: VideoCaptureProperties; Value: double): BOOL;
 begin
-  Result := set_VideoCapture(Self, Int(propId), Value);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_set(Self, Int(propId), Value);
+{$IFEND}
 end;
 
 class operator TVideoCapture.assign(var Dest: TVideoCapture; const [ref] Src: TVideoCapture);
@@ -37,12 +40,16 @@ end;
 
 class operator TVideoCapture.Finalize(var Dest: TVideoCapture);
 begin
-  destructor_VideoCapture(Dest);
+{$IF not defined(PACKAGE)}
+  destructor_CV_VIDEOCAPTURE(Dest);
+{$IFEND}
 end;
 
 function TVideoCapture.get(propId: VideoCaptureProperties): double;
 begin
-  Result := get_VideoCapture(Self, Int(propId));
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_get(Self, Int(propId));
+{$IFEND}
 end;
 
 class operator TVideoCapture.Implicit(const filename: string): TVideoCapture;
@@ -67,68 +74,88 @@ end;
 
 class operator TVideoCapture.Initialize(out Dest: TVideoCapture);
 begin
-  constructor_VideoCapture(Dest);
+{$IF not defined(PACKAGE)}
+  constructor_CV_VIDEOCAPTURE_5(Dest);
+{$IFEND}
 end;
 
 function TVideoCapture.isOpened: BOOL;
 begin
-  Result := isOpened_VideoCapture(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_isOpened(Self);
+{$IFEND}
 end;
 
 function TVideoCapture.open(const filename: String; const apiPreference: VideoCaptureAPIs; const params: Vector<Int>): BOOL;
 begin
+{$IF not defined(PACKAGE)}
   try
-    Result := open_VideoCapture(Self, filename, Int(apiPreference), params);
+    Result := class_func_CV_VIDEOCAPTURE_open_1(Self, filename, Int(apiPreference), params);
   except
     Result := False;
   end;
+{$IFEND}
 end;
 
 function TVideoCapture.open(const filename: String; const apiPreference: VideoCaptureAPIs): BOOL;
 begin
+{$IF not defined(PACKAGE)}
   try
-    Result := open_VideoCapture(Self, filename, Int(apiPreference));
+    Result := class_func_CV_VIDEOCAPTURE_open(Self, filename, Int(apiPreference));
   except
     Result := False;
   end;
+{$IFEND}
 end;
 
-function TVideoCapture.open(const index: Int; const apiPreference: VideoCaptureAPIs; const params:vector<int>): BOOL;
+function TVideoCapture.open(const index: Int; const apiPreference: VideoCaptureAPIs; const params: Vector<Int>): BOOL;
 begin
+{$IF not defined(PACKAGE)}
   try
-    Result := open_VideoCapture(Self, index, apiPreference, params);
+    Result := class_func_CV_VIDEOCAPTURE_open_3(Self, index, Int(apiPreference), params);
   except
     Result := False;
   end;
+{$IFEND}
 end;
 
 function TVideoCapture.open(const index: Int; const apiPreference: VideoCaptureAPIs): BOOL;
 begin
+{$IF not defined(PACKAGE)}
   try
-    Result := open_VideoCapture(Self, index, Int(apiPreference));
+    Result := class_func_CV_VIDEOCAPTURE_open_2(Self, index, Int(apiPreference));
   except
     Result := False;
   end;
+{$IFEND}
 end;
 
 function TVideoCapture.read(const image: TOutputArray): BOOL;
 begin
-  Result := read_VideoCapture(Self, image);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_read(Self, image);
+{$IFEND}
 end;
 
 function TVideoCapture.grab(): BOOL;
 begin
-  Result := grab_VideoCapture(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_grab(Self);
+{$IFEND}
 end;
 
 function TVideoCapture.retrieve(const image: TOutputArray; flag: Int = 0): BOOL;
 begin
-  Result := retrieve_VideoCapture(Self, image, flag);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_retrieve(Self, image, flag);
+{$IFEND}
 end;
 
 procedure TVideoCapture.release;
 begin
-  release_VideoCapture(Self);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_VIDEOCAPTURE_release(Self);
+{$IFEND}
 end;
 
 { TVideoWriter }
@@ -142,7 +169,9 @@ end;
 
 class operator TVideoWriter.Finalize(var Dest: TVideoWriter);
 begin
-  destructor_VideoWriter(Dest);
+{$IF not defined(PACKAGE)}
+  destructor_CV_VIDEOWRITER(Dest);
+{$IFEND}
 end;
 
 class operator TVideoWriter.LessThan(const VideoWriter: TVideoWriter; const frame: TMat): BOOL;
@@ -153,27 +182,37 @@ end;
 
 class operator TVideoWriter.Initialize(out Dest: TVideoWriter);
 begin
-  constructor_VideoWriter(Dest);
+{$IF not defined(PACKAGE)}
+  constructor_CV_VIDEOWRITER_5(Dest);
+{$IFEND}
 end;
 
 function TVideoWriter.isOpened: BOOL;
 begin
-  Result := isOpened_VideoWriter(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOWRITER_isOpened(Self);
+{$IFEND}
 end;
 
 function TVideoWriter.open(const filename: String; fourcc: Int; fps: double; const frameSize: TSize; isColor: BOOL): BOOL;
 begin
-  Result := open_VideoWriter(Self, filename, fourcc, fps, frameSize, isColor);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOWRITER_open_3(Self, filename, fourcc, fps, frameSize, isColor);
+{$IFEND}
 end;
 
 procedure TVideoWriter.release;
 begin
-  release_VideoWriter(Self);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_VIDEOWRITER_release(Self);
+{$IFEND}
 end;
 
 procedure TVideoWriter.write(const image: TInputArray);
 begin
-  write_VideoWriter(Self, image);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_VIDEOWRITER_write(Self, image);
+{$IFEND}
 end;
 
-{$ENDIF}
+{$IFEND}

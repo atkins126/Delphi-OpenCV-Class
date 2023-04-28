@@ -20,9 +20,11 @@
   limitations under the License.
 *)
 
-{$IFNDEF OPENCV_OBJDETECT_HPP}
+{$IF not defined(OPENCV_OBJDETECT_HPP)}
 {$DEFINE OPENCV_OBJDETECT_HPP}
-{$I 'core.inc'}
+
+{$IF not defined(OPENCV_CORE_HPP)}{$I 'core.inc'}{$ifend}
+
 (* *
   @defgroup objdetect Object Detection
 
@@ -803,7 +805,5 @@ Type
 
 {$I 'objdetect/detection_based_tracker.inc'}
 {$I 'objdetect/face.inc'}
-{$I 'external/opencv.CascadeClassifier.import.inc'}
-{$I 'external/opencv.HOGDescriptor.import.inc'}
-{$I 'external/opencv.QRCodeDetector.import.inc'}
-{$ENDIF}
+
+{$IFEND}

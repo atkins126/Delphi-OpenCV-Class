@@ -20,8 +20,10 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_VIDEO_HPP}
+{$if not defined(OPENCV_VIDEO_HPP)}
 {$define OPENCV_VIDEO_HPP}
+
+{$IF not defined(OPENCV_IMGPROC_HPP)}{$I 'imgproc.inc'}{$ifend}
 
 (**
   @defgroup video Video Analysis
@@ -35,4 +37,4 @@
 {$i 'video/tracking.inc'}
 {$i 'video/background_segm.inc'}
 
-{$endif OPENCV_VIDEO_HPP}
+{$ifend OPENCV_VIDEO_HPP}

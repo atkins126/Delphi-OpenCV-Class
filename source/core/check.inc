@@ -20,10 +20,10 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_CORE_CHECK_HPP}
+{$if not defined(OPENCV_CORE_CHECK_HPP)}
 {$define OPENCV_CORE_CHECK_HPP}
 
-{$i 'core/base.inc'}
+{$IF not defined(OPENCV_CORE_BASE_HPP)}{$I 'core/base.inc'}{$ifend}
 
 //namespace cv {
 
@@ -41,10 +41,10 @@ char const * cv::depthToString(int)
 ?depthToString_@detail@cv@@YAPEBDH@Z
 char const * cv::detail::depthToString_(int)
 }
-function depthToString(depth:int):pAnsiChar;
-external opencv_world_dll
-name '?depthToString_@detail@cv@@YAPEBDH@Z'
-{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
+function depthToString(depth:int):pCVChar; {$IFDEF USE_INLINE}inline; {$ENDIF}
+//external opencv_world_dll
+//name '?depthToString_@detail@cv@@YAPEBDH@Z'
+//{$IFDEF DELAYED_LOAD_DLL} delayed{$ENDIF};
 
 
 (** Returns string of cv::Mat depth value: CV_8UC3 -> "CV_8UC3" or "<invalid type>" *)
@@ -196,4 +196,7 @@ CV_EXPORTS void CV_NORETURN check_failed_MatChannels(const int v, const CheckCon
 } // namespace
 *)
 
-{$endif OPENCV_CORE_CHECK_HPP}
+{$ELSE}
+{$MESSAGE FATAL 'Duplicate included file - core/check.inc'}
+
+{$ifend OPENCV_CORE_CHECK_HPP}

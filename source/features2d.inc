@@ -20,17 +20,12 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_FEATURES_2D_HPP}
+{$if not defined(OPENCV_FEATURES_2D_HPP)}
 {$define OPENCV_FEATURES_2D_HPP}
 
-{$I 'opencv_modules.inc'}
-{$IFNDEF OPENCV_CORE_HPP}
-{$I 'core.inc'}
-{$ENDIF}
-
-{$ifdef HAVE_OPENCV_FLANN}
-{$I 'flann/miniflann.inc'}
-{$endif}
+{$if not defined(OPENCV_OPENCV_MODULES_HPP)}{$I 'opencv_modules.inc'}{$ifend}
+{$IF not defined(OPENCV_CORE_HPP)}{$I 'core.inc'}{$ifend}
+{$if defined(HAVE_OPENCV_FLANN)}{$I 'flann/miniflann.inc'}{$endif}
 
 (**
   @defgroup features2d 2D Features Framework
@@ -197,6 +192,8 @@ Type
     // see corresponding cv::Algorithm method
 // CV_WRAP inline void write(const Ptr<FileStorage>& fs, const String& name = String()) const { Algorithm::write(fs, name); }
  end;
+
+ TPtr_TFeature2D = TPtr<TFeature2D>;
 
 (** Feature detectors in OpenCV have wrappers with a common interface that enables you to easily switch
 between different algorithms solving the same problem. All objects that implement keypoint detectors
@@ -1176,6 +1173,9 @@ private
 //    std::vector<UMat> utrainDescCollection;
 end;
 
+TPtr_TDescriptorMatcher = TPtr<TDescriptorMatcher>;
+
+
 (** @brief Brute-force descriptor matcher.
 
 For each descriptor in the first set, this matcher finds the closest descriptor in the second set
@@ -1294,6 +1294,7 @@ Type
   DRAW_RICH_KEYPOINTS = 4 //!< For each keypoint the circle around keypoint with keypoint size and
                           //!< orientation will be drawn.
 );
+
 //CV_ENUM_FLAGS(DrawMatchesFlags)
 
 (** @brief Draws keypoints.
@@ -1538,8 +1539,4 @@ vocabulary in the given image.
 
 //} (* namespace cv *)
 
-{$i 'external/opencv.SIFT.import.inc'}
-{$i 'external/opencv.DescriptorMatcher.import.inc'}
-{$i 'external/opencv.ORB.import.inc'}
-
-{$endif}
+{$ifend}

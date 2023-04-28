@@ -20,24 +20,51 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_VERSION_HPP}
-{$define OPENCV_VERSION_HPP}
+{$IF not defined(OPENCV_VERSION_HPP)}
+{$DEFINE OPENCV_VERSION_HPP}
+
+{$IF not defined(CVOPT)}{$I opt.inc}{$IFEND}
 
 const
+{$IFDEF OPENCV_455}
   CV_VERSION_MAJOR    = '4';
   CV_VERSION_MINOR    = '5';
   CV_VERSION_REVISION = '5';
   CV_VERSION_STATUS   = '';
-
+  (* old  style version constants *)
+  CV_MAJOR_VERSION    = 4; // CV_VERSION_MAJOR;
+  CV_MINOR_VERSION    = 5; // CV_VERSION_MINOR;
+  CV_SUBMINOR_VERSION = 4; // CV_VERSION_REVISION;
+{$ENDIF}
+{$IFDEF OPENCV_460}
+  CV_VERSION_MAJOR    = '4';
+  CV_VERSION_MINOR    = '6';
+  CV_VERSION_REVISION = '0';
+  CV_VERSION_STATUS   = '';
+  (* old  style version constants *)
+  CV_MAJOR_VERSION    = 4; // CV_VERSION_MAJOR;
+  CV_MINOR_VERSION    = 6; // CV_VERSION_MINOR;
+  CV_SUBMINOR_VERSION = 0; // CV_VERSION_REVISION;
+{$ENDIF}
+{$IFDEF OPENCV_470}
+  CV_VERSION_MAJOR    = '4';
+  CV_VERSION_MINOR    = '7';
+  CV_VERSION_REVISION = '0';
+  CV_VERSION_STATUS   = '';
+  (* old  style version constants *)
+  CV_MAJOR_VERSION    = 4; // CV_VERSION_MAJOR;
+  CV_MINOR_VERSION    = 7; // CV_VERSION_MINOR;
+  CV_SUBMINOR_VERSION = 0; // CV_VERSION_REVISION;
+{$ENDIF}
   CV_VERSION = CV_VERSION_MAJOR + '.' + CV_VERSION_MINOR + '.' + CV_VERSION_REVISION + CV_VERSION_STATUS;
 
-  (* old  style version constants *)
-  CV_MAJOR_VERSION    = 4;//CV_VERSION_MAJOR;
-  CV_MINOR_VERSION    = 5;//CV_VERSION_MINOR;
-  CV_SUBMINOR_VERSION = 4;//CV_VERSION_REVISION;
+  cvdllversion      = CV_VERSION_MAJOR + CV_VERSION_MINOR + CV_VERSION_REVISION;
+{$IF not defined(PACKAGE)}
+  opencv_delphi_dll = 'opencv_delphi' + cvdllversion + {$IFDEF USE_DEBUG_DLLS} 'd' + {$ENDIF} '.dll';
+  opencv_world_dll  = 'opencv_world' + cvdllversion + {$IFDEF USE_DEBUG_DLLS} 'd' + {$ENDIF} '.dll';
+{$ifend}
 
-  cvdllversion         = CV_VERSION_MAJOR + CV_VERSION_MINOR + CV_VERSION_REVISION;
-  opencv_delphi_dll = 'opencv_delphi' + cvdllversion + {$IFDEF DEBUG} 'd' + {$ENDIF} '.dll';
-  opencv_world_dll  = 'opencv_world' + cvdllversion + {$IFDEF DEBUG} 'd' + {$ENDIF} '.dll';
+{$ELSE}
+{$MESSAGE FATAL 'Duplicate included file - core/version.inc'}
 
-{$ENDIF OPENCV_VERSION_HPP}
+{$IFEND OPENCV_VERSION_HPP}

@@ -20,17 +20,10 @@
   limitations under the License.
 *)
 
-{$IFNDEF OPENCV_ML_HPP}
+{$IF not defined(OPENCV_ML_HPP)}
 {$DEFINE OPENCV_ML_HPP}
-// #ifdef __cplusplus
-{$I 'core.inc'}
-// #endif
 
-// #ifdef __cplusplus
-
-// #include <float.h>
-// #include <map>
-// #include <iostream>
+{$IF not defined(OPENCV_CORE_HPP)}{$I 'core.inc'}{$ifend}
 
 (* *
   @defgroup ml Machine Learning
@@ -309,6 +302,8 @@ Type
     class function create(const samples:TInputArray; layout:SampleTypes;const responses:TInputArray):TPtr<TTrainData>;
     overload;static; {$IFDEF USE_INLINE}inline; {$ENDIF}
   end;
+
+  TPtr_TTrainData = TPtr<TTrainData>;
 
   (* * @brief Base class for statistical models in OpenCV ML.
   *)
@@ -839,6 +834,8 @@ Type
     function predict(const samples: TInputArray; const results: TOutputArray; flags: Int = 0): float; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
     function predict(const samples: TInputArray): float; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
   end;
+
+  TPtr_TSVM_pT = TPtr<TSVM>.pT;
 
   (* ***************************************************************************************\
     *                              Expectation - Maximization                                *
@@ -1651,6 +1648,8 @@ Type
    function predict(const samples:TInputArray):float; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
   end;
 
+  TPtr_TANN_MLP = TPtr<TANN_MLP>;
+
 {$IFNDEF DISABLE_OPENCV_3_COMPATIBILITY}
 
   TANN_MLP_ANNEAL = TANN_MLP;
@@ -1981,11 +1980,8 @@ Type
   // }
   // }
 
-  { .$i 'ml/ml.inl.inc' }
+  {$i 'ml/ml.inl.inc' }
 
-{$I 'externAL/opencv.SVM.import.inc'}
-{$I 'externAL/opencv.ANN_MLP.import.inc'}
-{$I 'externAL/opencv.TrainData.import.inc'}
   // #endif // __cplusplus
-{$ENDIF  OPENCV_ML_HPP}
+{$IFEND  OPENCV_ML_HPP}
   (* End of file. *)

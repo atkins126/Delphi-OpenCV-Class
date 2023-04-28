@@ -20,11 +20,11 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_CORE_SATURATE_HPP}
+{$if not defined(OPENCV_CORE_SATURATE_HPP)}
 {$define OPENCV_CORE_SATURATE_HPP}
 
-{$i 'core/cvdef.inc'}
-{$i 'core/fast_math.inc'}
+{$IF not defined(OPENCV_CORE_CVDEF_H)}{$I 'core/cvdef.inc'}{$ifend}
+{$if not defined(OPENCV_CORE_FAST_MATH_HPP)}{$i 'core/fast_math.inc'}{$ifend}
 
 //namespace cv
 //{
@@ -162,4 +162,7 @@ Type
 
 //} // cv
 
-{$endif OPENCV_CORE_SATURATE_HPP}
+{$ELSE}
+{$MESSAGE FATAL 'Duplicate included file - core/saturate.inc'}
+
+{$ifend} //OPENCV_CORE_SATURATE_HPP

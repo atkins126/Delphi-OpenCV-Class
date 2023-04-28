@@ -20,7 +20,8 @@
   limitations under the License.
 *)
 
-{$IFDEF OPENCV_CORE_TYPES_HPP}
+{$IF defined(OPENCV_CORE_TYPES_HPP) and (not defined(OPENCV_CORE_TYPES_HPP_IMPL))}
+{$DEFINE OPENCV_CORE_TYPES_HPP_IMPL}
 { TPoint_<T> }
 
 class operator TPoint_<T>.Implicit(const m: TPoint_<T>): UInt64;
@@ -41,8 +42,8 @@ begin
   end
   else if TypeInfo(T) = TypeInfo(double) then
   begin
-    Result.x := Trunc(pDouble(@p.x)^);
-    Result.y := Trunc(pDouble(@p.y)^);
+    Result.x := Trunc(System.pDouble(@p.x)^);
+    Result.y := Trunc(System.pDouble(@p.y)^);
   end
   else
     Assert(false, 'Point type must be Single(Float) or Double');
@@ -59,8 +60,8 @@ begin
   end
   else if TypeInfo(T) = TypeInfo(double) then
   begin
-    pDouble(@Result.x)^ := pDouble(@a.x)^ - pDouble(@b.x)^;
-    pDouble(@Result.y)^ := pDouble(@a.y)^ - pDouble(@b.y)^;
+    System.pDouble(@Result.x)^ := System.pDouble(@a.x)^ - System.pDouble(@b.x)^;
+    System.pDouble(@Result.y)^ := System.pDouble(@a.y)^ - System.pDouble(@b.y)^;
   end
   else if TypeInfo(T) = TypeInfo(Int) then
   begin
@@ -122,6 +123,12 @@ class function TPoint_<T>.Point(_x, _y: T): TPoint_<T>;
 begin
   Result.x := _x;
   Result.y := _y;
+end;
+
+class function TPoint_<T>.Point(): TPoint_<T>;
+begin
+  Result.x := default(T);
+  Result.y := default(T);
 end;
 
 function Point(const _x, _y: Int): TPoint;
@@ -205,6 +212,7 @@ end;
 
 class operator TRect_<T>.BitwiseAnd(const a, b: TRect_<T>): TRect_<T>;
 begin
+
   Result := default (TRect_<T>);
   if TypeInfo(T) = TypeInfo(Int) then
   begin
@@ -235,6 +243,7 @@ begin
   end
   else
     Assert(false, 'Point type must be numeric');
+
 end;
 
 class function TRect_<T>.Rect(const _x: T; _y, _width, _height: T): TRect_<T>;
@@ -306,7 +315,9 @@ end;
 
 class function TScalar.Create(const v0, v1, v2, v3: double): TScalar;
 begin
-  constructor_Scalar(Result, v0, v1, v2, v3);
+{$IF not defined(PACKAGE)}
+  constructor_CV_GAPI_OWN_SCALAR_1(Result, v0, v1, v2, v3);
+{$IFEND}
 end;
 
 class function TScalar.all(const v0: double): TScalar;
@@ -316,7 +327,9 @@ end;
 
 class function TScalar.Create(const v0: double): TScalar;
 begin
-  constructor_Scalar(Result, v0);
+{$IF not defined(PACKAGE)}
+  constructor_CV_GAPI_OWN_SCALAR(Result, v0);
+{$IFEND}
 end;
 
 function TScalar.getval(const index: integer): double;
@@ -332,7 +345,9 @@ end;
 
 class operator TScalar.Initialize(out Dest: TScalar);
 begin
-  constructor_Scalar(Dest);
+{$IF not defined(PACKAGE)}
+  constructor_CV_GAPI_OWN_SCALAR_2(Dest);
+{$IFEND}
 end;
 
 procedure TScalar.setval(const index: integer; const Value: double);
@@ -348,7 +363,7 @@ end;
 
 class operator TScalar.Implicit(const a: TArray<double>): TScalar;
 begin
-  for var i := 0 to cv.opencv.MIN(High(a), High(Result.v)) do
+  for var i := 0 to System.Math.MIN(High(a), High(Result.v)) do
     Result.v[i] := a[i];
 end;
 
@@ -360,6 +375,11 @@ end;
 function Scalar(const v: TVec3b): TScalar;
 begin
   Result := Scalar(v[0], v[1], v[2]);
+end;
+
+function Scalar: TScalar;
+begin
+  Result := TScalar.Scalar();
 end;
 
 { TTermCriteria }
@@ -413,4 +433,4 @@ begin
   Result := Range(INT_MIN, INT_MAX);
 end;
 
-{$ENDIF}
+{$IFEND}

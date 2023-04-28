@@ -20,13 +20,13 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_STITCHING_STITCHER_HPP}
+{$if not defined(OPENCV_STITCHING_STITCHER_HPP)}
 {$define OPENCV_STITCHING_STITCHER_HPP}
 
-{$i 'core.inc'}
-{$i 'features2d.inc'}
+{$IF not defined(OPENCV_CORE_HPP)}{$I 'core.inc'}{$ifend}
+{$if not defined(OPENCV_FEATURES_2D_HPP)}{$i 'features2d.inc'}{$ifend}
 {$i 'stitching/warpers.inc'}
-{$i 'stitching/detail/matchers.inc'}
+{$if not defined(OPENCV_STITCHING_MATCHERS_HPP)}{$i 'stitching/detail/matchers.inc'}{$ifend}
 {$i 'stitching/detail/motion_estimators.inc'}
 {$i 'stitching/detail/exposure_compensate.inc'}
 {$i 'stitching/detail/seam_finders.inc'}
@@ -113,6 +113,7 @@ familiar with the theory is recommended.
 -   A detailed example on image stitching can be found at
     opencv_source_code/samples/cpp/stitching_detailed.cpp
  *)
+
   TStitcher = record
   public
     (**
@@ -323,6 +324,8 @@ private
 //    double warped_image_scale_;
 end;
 
+TPtr_TStitcher_pT = TPtr<TStitcher>.pT;
+
 (**
  * @deprecated use Stitcher::create
  *)
@@ -337,6 +340,4 @@ end;
 
 //} // namespace cv
 
-{$i 'external/opencv.Stitcher.import.inc'}
-
-{$endif OPENCV_STITCHING_STITCHER_HPP}
+{$ifend OPENCV_STITCHING_STITCHER_HPP}

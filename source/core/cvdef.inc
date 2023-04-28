@@ -20,15 +20,17 @@
   limitations under the License.
 *)
 
-{$IFNDEF OPENCV_CORE_CVDEF_H}
+{$IF not defined(OPENCV_CORE_CVDEF_H)}
 {$DEFINE OPENCV_CORE_CVDEF_H}
-{$I 'core/version.inc'}
+
+{$IF not defined(OPENCV_VERSION_HPP)}{$I 'core/version.inc'}{$ifend}
+
 // ! @addtogroup core_utils
 // ! @{
 
 {$IF DEFINED(OPENCV_INCLUDE_PORT_FILE)}  // User-provided header file with custom platform configuration
 {$I OPENCV_INCLUDE_PORT_FILE}
-{$ENDIF}
+{$IFEND}
 (*
   #if !defined CV_DOXYGEN && !defined CV_IGNORE_DEBUG_BUILD_GUARD
   #if (defined(_MSC_VER) && (defined(DEBUG) || defined(_DEBUG))) || \
@@ -163,7 +165,7 @@
   {$I <limits.h>
   {$endif}
 *)
-{$I 'core/hal/interface.inc'}
+{$IF not defined(OPENCV_CORE_HAL_INTERFACE_H)}{$I 'core/hal/interface.inc'}{$ifend}
 (*
   #if defined __ICL
   #  define CV_ICC   __ICL
@@ -455,9 +457,12 @@ const
 
 const
   CV_MAT_CN_MASK = ((CV_CN_MAX - 1) shl CV_CN_SHIFT);
-  // CV_MAT_CN(flags)       = ((((flags) & CV_MAT_CN_MASK) >> CV_CN_SHIFT) + 1);
   CV_MAT_TYPE_MASK = (CV_DEPTH_MAX * CV_CN_MAX - 1);
+  // CV_MAT_CN(flags)       = ((((flags) & CV_MAT_CN_MASK) >> CV_CN_SHIFT) + 1);
+function CV_MAT_CN(flags:int):int;inline;
   // CV_MAT_TYPE(flags)     = ((flags) & CV_MAT_TYPE_MASK);
+function CV_MAT_TYPE(flags:int):int;inline;
+const
   CV_MAT_CONT_FLAG_SHIFT = 14;
   CV_MAT_CONT_FLAG       = (1 shl CV_MAT_CONT_FLAG_SHIFT);
   // CV_IS_MAT_CONT(flags)  = ((flags) & CV_MAT_CONT_FLAG);
@@ -469,17 +474,18 @@ const
   (* * Size of each channel item,
     0x28442211 = 0010 1000 0100 0100 0010 0010 0001 0001 ~ array of sizeof(arr_type_elem) *)
   // CV_ELEM_SIZE1(type) = ((0x28442211 >> CV_MAT_DEPTH(type)*4) & 15);
+function CV_ELEM_SIZE1(&type:int):int;inline;
 
   // CV_ELEM_SIZE(type) =(CV_MAT_CN(type)*CV_ELEM_SIZE1(type));
-
+function CV_ELEM_SIZE(&type:int):int;inline;
   // #ifndef MIN
   // #  define MIN(a,b)  ((a) > (b) ? (b) : (a))
   // {$endif}
-function MIN(a, b: Int): Int; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}// ((a) > (b) ? (b) : (a))
+function cvMIN(a, b: Int): Int; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}// ((a) > (b) ? (b) : (a))
 // #ifndef MAX
 // #  define MAX(a,b)  ((a) < (b) ? (b) : (a))
 // {$endif}
-  function MAX(a, b: Int): Int; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}// ((a) < (b) ? (b) : (a))
+function cvMAX(a, b: Int): Int; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}// ((a) < (b) ? (b) : (a))
 
   /// ////////////////////////////////////// Enum operators ///////////////////////////////////////
 
@@ -949,7 +955,11 @@ function MIN(a, b: Int): Int; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}// ((
     //! @}
   *)
   // #ifndef __cplusplus
-{$I 'core/fast_math.inc'}  // define cvRound(double)
+{$if not defined(OPENCV_CORE_FAST_MATH_HPP)}{$i 'core/fast_math.inc'}{$ifend}
+// define cvRound(double)
   // {$endif}
 
-{$ENDIF} // OPENCV_CORE_CVDEF_H
+{$ELSE}
+{$MESSAGE FATAL 'Duplicate included file - core/cvdef.inc'}
+
+{$IFEND} // OPENCV_CORE_CVDEF_H

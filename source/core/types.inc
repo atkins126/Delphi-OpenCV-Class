@@ -20,7 +20,7 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_CORE_TYPES_HPP}
+{$if not defined(OPENCV_CORE_TYPES_HPP)}
 {$define OPENCV_CORE_TYPES_HPP}
 
 {$if (not defined(WIN64)) and (CompilerVersion < 34.0)}
@@ -32,9 +32,9 @@
 //#include <vector>
 //#include <limits>
 
-{$I 'core/cvdef.inc'}
-{$I 'core/cvstd.inc'}
-{$I 'core/matx.inc'}
+{$IF not defined(OPENCV_CORE_CVDEF_H)}{$I 'core/cvdef.inc'}{$ifend}
+{$IF not defined(OPENCV_CORE_CVSTD_HPP)}{$I 'core/cvstd.inc'}{$ifend}
+{$if not defined(OPENCV_CORE_MATX_HPP)}{$I 'core/matx.inc'}{$ifend}
 
 //namespace cv
 //{
@@ -139,7 +139,9 @@ Example:
   public
     // ! default constructor
     // Point_();
-    class function Point(_x, _y: T): TPoint_<T>; static; {$IFDEF USE_INLINE}inline; {$ENDIF}// Point_(_Tp _x, _Tp _y);
+    class function Point(): TPoint_<T>; overload; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    // Point_(_Tp _x, _Tp _y);
+    class function Point(_x, _y: T): TPoint_<T>; overload; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
     // #if (defined(__GNUC__) && __GNUC__ < 5)  // GCC 4.x bug. Details: https://github.com/opencv/opencv/pull/20837
     // Point_(const Point_& pt);
     // Point_(Point_&& pt) CV_NOEXCEPT = default;
@@ -679,7 +681,7 @@ TScalar = record
 {$HINTS ON}
   public
     class operator Initialize(out Dest: TScalar); // Scalar_();
-    class function Scalar:TScalar; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    class function Scalar():TScalar; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
     class function Create(const v0, v1: double; const v2: double = 0; const v3: double = 0): TScalar; overload; static; {$IFDEF USE_INLINE}inline; {$ENDIF} // Scalar_(_Tp v0, _Tp v1, _Tp v2=0, _Tp v3=0);
     class function Create(const v0: double): TScalar; overload; static; {$IFDEF USE_INLINE}inline; {$ENDIF}// Scalar_(_Tp v0);
     // Scalar_(const Scalar_& s);
@@ -702,6 +704,7 @@ TScalar = record
 
 function Scalar(const v0: double; const v1: double = 0; const v2: double = 0; const v3: double = 0): TScalar; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
 function Scalar(const v: TVec3b): TScalar; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+function Scalar: TScalar; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
 
 (*
 template<typename _Tp> class DataType< Scalar_<_Tp> >
@@ -2435,6 +2438,7 @@ TermCriteria::TermCriteria(int _type, int _maxCount, double _epsilon)
 } // cv
 *)
 
-{$I 'external/opencv.Scalar.import.inc'}
+{$ELSE}
+{$MESSAGE FATAL 'Duplicate included file - core/types.inc'}
 
-{$endif OPENCV_CORE_TYPES_HPP}
+{$ifend OPENCV_CORE_TYPES_HPP}

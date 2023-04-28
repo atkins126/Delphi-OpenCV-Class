@@ -20,7 +20,7 @@
   limitations under the License.
 *)
 
-{$IFNDEF OPENCV_CORE_HAL_INTERFACE_H}
+{$IF not defined(OPENCV_CORE_HAL_INTERFACE_H)}
 {$define OPENCV_CORE_HAL_INTERFACE_H}
 
 //! @addtogroup core_hal_interface
@@ -54,24 +54,6 @@ const
 //! @
 
 Type
-  BOOL          = ByteBool;
-  size_t        = NativeUInt;
-  psize_t       = ^size_t;
-  Int           = integer;
-  uint          = Cardinal;
-  pInt          = ^Int;
-  short 	= Int16;
-  ushort	= UInt16;
-  unsigned      = UInt32;
-  float         = Single;
-  pFloat        = ^float;
-  ppAnsiChar    = ^pAnsiChar;
-  uchar         = Byte;
-  pUChar        = type pByte;
-  pMatOp        = type Pointer;
-  pUCharConst   = pUChar;
-  PointerConst  = type Pointer;
-  //
   vftable_func = type Pointer;
   pvftable     = ^vftable_func;
 
@@ -243,4 +225,8 @@ const
 //! @}
 
 //! @}
-{$ENDIF}// OPENCV_CORE_HAL_INTERFACE_H
+
+{$ELSE}
+{$MESSAGE FATAL 'Duplicate included file - core/hal/interface.inc'}
+
+{$IFEND}// OPENCV_CORE_HAL_INTERFACE_H

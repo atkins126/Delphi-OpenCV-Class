@@ -36,6 +36,8 @@ Uses
   System.SyncObjs,
   VCL.Controls,
   VCL.Graphics,
+  VCL.Themes,
+  cpp.utils,
   cv.opencv;
 
 Type
@@ -55,6 +57,8 @@ Type
 
     function getEnabled: Boolean;
     procedure setEnabled(const Value: Boolean);
+
+    function getObjectName: String;
     // function getMat: TMat;
     // function GetName: string;
     // function getHeight: Integer;
@@ -84,6 +88,7 @@ Type
 
     function getEnabled: Boolean; virtual; abstract;
     procedure setEnabled(const Value: Boolean); virtual; abstract;
+    function getObjectName: String;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -125,37 +130,37 @@ Type
     property Source: ICVDataSource Read FCVSource write SetCVSource;
   end;
 
-  TCVView = class(TWinControl, ICVDataReceiver)
+  [ComponentPlatformsAttribute(pidWin64)]
+  TCVView = class(TCustomControl, ICVDataReceiver)
   private
-    FMat: TMat; // Stored last received Mat
-  protected
+    FMat: pMat; // Stored last received Mat
     [weak]
     FCVSource: ICVDataSource;
+    FStretch: Boolean;
     FOnAfterPaint: TOnCVAfterPaint;
     FOnBeforePaint: TOnCVNotify;
-    FCanvas: TCanvas;
-    FStretch: Boolean;
-    FProportional: Boolean;
     FCenter: Boolean;
-    procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
+    FProportional: Boolean;
     procedure WMPaint(var Message: TWMPaint); message WM_PAINT;
-
-    procedure SetSource(const Value: TObject);
-    procedure SetCVSource(const Value: ICVDataSource);
-
+    procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
     procedure TakeMat(const AMat: TMat);
-
-    function isSourceEnabled: Boolean;
-    function MatIsEmpty: Boolean;
-
+    procedure SetSource(const Value: TObject);
+    function getMat: TMat;
+    procedure setMat(const Value: TMat);
     function PaintRect: System.Types.TRect;
+    procedure SetCVSource(const Value: ICVDataSource);
+    procedure PaintDisignInfo;
+    procedure PaintInRunTime;
+  protected
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function isSourceEnabled: Boolean;
+    function MatIsEmpty: Boolean;
     procedure DrawMat(const AMat: TMat);
-    property Canvas: TCanvas read FCanvas;
   published
     property Source: ICVDataSource Read FCVSource write SetCVSource;
+    property Mat: TMat read getMat write setMat;
     property Proportional: Boolean read FProportional write FProportional default False;
     property Stretch: Boolean read FStretch write FStretch default True;
     property Center: Boolean read FCenter write FCenter default False;
@@ -175,6 +180,7 @@ Type
     property OnMouseWheel;
     property OnMouseWheelUp;
     property OnMouseWheelDown;
+    property Enabled;
   end;
 
   TOCVLock                   = TLightweightMREW;
@@ -238,24 +244,25 @@ Type
     OPENNI_ASUS,          // !< OpenNI (for Asus Xtion)
     ANDROID,              // !< Android - not used
     XIAPI,                // !< XIMEA Camera API
-    AVFOUNDATION,         // !< AVFoundation framework for iOS (OS X Lion will have the same API)
-    GIGANETIX,            // !< Smartek Giganetix GigEVisionSDK
-    MSMF,                 // !< Microsoft Media Foundation (via videoInput)
-    WINRT,                // !< Microsoft Windows Runtime using Media Foundation
-    INTELPERC,            // !< RealSense (former Intel Perceptual Computing SDK)
-    REALSENSE,            // !< Synonym for CAP_INTELPERC
-    OPENNI2,              // !< OpenNI2 (for Kinect)
-    OPENNI2_ASUS,         // !< OpenNI2 (for Asus Xtion and Occipital Structure sensors)
-    OPENNI2_ASTRA,        // !< OpenNI2 (for Orbbec Astra)
-    GPHOTO2,              // !< gPhoto2 connection
-    GSTREAMER,            // !< GStreamer
-    FFMPEG,               // !< Open and record video file or stream using the FFMPEG library
-    IMAGES,               // !< OpenCV Image Sequence (e.g. img_%02d.jpg)
-    ARAVIS,               // !< Aravis SDK
-    OPENCV_MJPEG,         // !< Built-in OpenCV MotionJPEG codec
-    INTEL_MFX,            // !< Intel MediaSDK
-    XINE,                 // !< XINE engine (Linux)
-    UEYE                  // !< uEye Camera API
+    AVFOUNDATION,
+    // !< AVFoundation framework for iOS (OS X Lion will have the same API)
+    GIGANETIX,     // !< Smartek Giganetix GigEVisionSDK
+    MSMF,          // !< Microsoft Media Foundation (via videoInput)
+    WINRT,         // !< Microsoft Windows Runtime using Media Foundation
+    INTELPERC,     // !< RealSense (former Intel Perceptual Computing SDK)
+    REALSENSE,     // !< Synonym for CAP_INTELPERC
+    OPENNI2,       // !< OpenNI2 (for Kinect)
+    OPENNI2_ASUS,  // !< OpenNI2 (for Asus Xtion and Occipital Structure sensors)
+    OPENNI2_ASTRA, // !< OpenNI2 (for Orbbec Astra)
+    GPHOTO2,       // !< gPhoto2 connection
+    GSTREAMER,     // !< GStreamer
+    FFMPEG,        // !< Open and record video file or stream using the FFMPEG library
+    IMAGES,        // !< OpenCV Image Sequence (e.g. img_%02d.jpg)
+    ARAVIS,        // !< Aravis SDK
+    OPENCV_MJPEG,  // !< Built-in OpenCV MotionJPEG codec
+    INTEL_MFX,     // !< Intel MediaSDK
+    XINE,          // !< XINE engine (Linux)
+    UEYE           // !< uEye Camera API
     );
 
   TCVCustomSource = class(TComponent)
@@ -305,6 +312,8 @@ const
     );
 
 Type
+
+  [ComponentPlatformsAttribute(pidWin64)]
   TCVWebCameraSource = class(TCVCustomSource)
   private
     FResolution: TCVWebCameraResolution;
@@ -321,6 +330,7 @@ Type
     property CustomResolution: TCVCustomResolution read FCustomResolution write FCustomResolution;
   end;
 
+  [ComponentPlatformsAttribute(pidWin64)]
   TCVFileSource = class(TCVCustomSource)
   private
     FFileName: TFileName;
@@ -342,6 +352,7 @@ Type
     procedure SetPropertiesClass(Value: TCVSourceTypeClass);
   end;
 
+  [ComponentPlatformsAttribute(pidWin64)]
   TCVCaptureSource = class(TCVDataSource, ICVEditorPropertiesContainer)
   protected
     FSourceThread: TCVCaptureThread;
@@ -391,8 +402,10 @@ Type
   published
     property SourceTypeClassName: string read GetPropertiesClassName write SetPropertiesClassName;
     property SourceType: TCVCustomSource read GetProperties write SetProperties;
+    property Enabled stored True;
   end;
 
+  [ComponentPlatformsAttribute(pidWin64)]
   TCVVideoWriter = class(TCVDataProxy)
   private
     FWriter: pVideoWriter;
@@ -436,8 +449,10 @@ Type
   end;
 
 function GetRegisteredCaptureSource: TRegisteredCaptureSource;
-function CV_FOURCC(const c1, c2, c3, c4: AnsiChar): Integer; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
-function CV_FOURCC(const c: AnsiString): Integer; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+function CV_FOURCC(const c1, c2, c3, c4: AnsiChar): Integer; overload;
+{$IFDEF USE_INLINE}inline; {$ENDIF}
+function CV_FOURCC(const c: AnsiString): Integer; overload;
+{$IFDEF USE_INLINE}inline; {$ENDIF}
 
 implementation
 
@@ -537,6 +552,11 @@ begin
   inherited;
 end;
 
+function TCVDataSource.getObjectName: String;
+begin
+  Result := Name;
+end;
+
 procedure TCVDataSource.NotifyReceiver(const AMat: TMat);
 Var
   R: ICVDataReceiver;
@@ -621,52 +641,112 @@ begin
     Source := Value as TCVDataSource;
 end;
 
-{ TOpenCVView }
+{ TCVView }
 
 constructor TCVView.Create(AOwner: TComponent);
 begin
   inherited;
-  FCanvas := TControlCanvas.Create;
-  TControlCanvas(FCanvas).Control := Self;
-  Stretch := True;
-  Proportional := False;
-  Center := False;
+  FComponentStyle := FComponentStyle - [csInheritable];
+  FStretch := True;
+  FProportional := False;
+  FCenter := False;
 end;
 
 destructor TCVView.Destroy;
 begin
   Source := nil;
-  FCanvas.Free;
-  inherited;
-end;
-
-procedure TCVView.SetCVSource(const Value: ICVDataSource);
-begin
-  if FCVSource <> Value then
+  if Assigned(FMat) then
   begin
-    if Assigned(FCVSource) and (not(csDesigning in ComponentState)) then
-      FCVSource.RemoveReceiver(Self);
-    FCVSource := Value;
-    if Assigned(FCVSource) and (not(csDesigning in ComponentState)) then
-      FCVSource.AddReceiver(Self);
+    Dispose(FMat);
+    FMat := nil;
   end;
-end;
-
-procedure TCVView.SetSource(const Value: TObject);
-begin
-  Source := Value as TCVDataSource;
+  inherited;
 end;
 
 procedure TCVView.DrawMat(const AMat: TMat);
 begin
-  FMat := AMat;
-  Invalidate;
+  if Enabled { or MatIsEmpty } then
+  begin
+    Mat := AMat;
+    Invalidate;
+  end;
 end;
 
-procedure TCVView.TakeMat(const AMat: TMat);
+function TCVView.getMat: TMat;
 begin
-  if not(csDestroying in ComponentState) then
-    DrawMat(AMat);
+  if Assigned(FMat) then
+    Result := FMat^;
+end;
+
+function TCVView.isSourceEnabled: Boolean;
+begin
+  Result := Assigned(Source) and (Source.Enabled);
+end;
+
+function TCVView.MatIsEmpty: Boolean;
+begin
+  Result := (not Assigned(FMat)) or FMat^.empty;
+end;
+
+procedure TCVView.PaintDisignInfo { (var Message: TWMPaint) };
+begin
+  Canvas.Lock;
+  try
+    Canvas.Font.Color := clWindowText;
+    var
+      Text: string := Name + ': ' + ClassName;
+    var
+      TextOneHeight: Integer := Canvas.TextHeight(Text) + 5;
+    var
+      TextHeight: Integer := TextOneHeight * 2 - 5;
+    if not Assigned(Source) then
+      TextHeight := TextHeight + TextOneHeight;
+
+    Var
+      x: Integer := (ClientWidth - Canvas.TextWidth(Text)) div 2;
+    Var
+      y: Integer := (ClientHeight - TextHeight) div 2;
+    Canvas.TextOut(x, y, Text);
+
+    Text := '(' + ClientWidth.ToString + ',' + ClientHeight.ToString + ')';
+    x := (ClientWidth - Canvas.TextWidth(Text)) div 2;
+    y := y + TextOneHeight;
+    Canvas.TextOut(x, y, Text);
+    if Assigned(Source) then
+    begin
+      Canvas.Font.Color := clWindowText;
+      Text := 'Source: ' + Source.getObjectName;
+    end
+    else
+    begin
+      Canvas.Font.Color := clRed;
+      Text := 'Source not defined';
+    end;
+    x := (ClientWidth - Canvas.TextWidth(Text)) div 2;
+    y := y + TextOneHeight;
+    Canvas.TextOut(x, y, Text);
+  finally
+    Canvas.Unlock;
+  end;
+end;
+
+procedure TCVView.PaintInRunTime;
+var
+  dc: HDC;
+  ps: TPaintStruct;
+begin
+  // Canvas.Lock;
+  dc := BeginPaint(Handle, ps);
+  try
+    if Assigned(OnBeforePaint) then
+      OnBeforePaint(Self, FMat^);
+    if ipDraw(dc { Canvas.Handle } , FMat^, PaintRect) then
+      if Assigned(OnAfterPaint) then
+        OnAfterPaint(Self, FMat^);
+  finally
+    EndPaint(Handle, ps);
+    // Canvas.Unlock;
+  end;
 end;
 
 function TCVView.PaintRect: System.Types.TRect;
@@ -726,86 +806,53 @@ begin
     OffsetRect(Result, (CliWidth - ViewWidth) div 2, (CliHeight - ViewHeight) div 2);
 end;
 
-function TCVView.isSourceEnabled: Boolean;
+procedure TCVView.SetCVSource(const Value: ICVDataSource);
 begin
-  Result := Assigned(Source) and (Source.Enabled);
+  if FCVSource <> Value then
+  begin
+    if Assigned(FCVSource) and (not(csDesigning in ComponentState)) then
+      FCVSource.RemoveReceiver(Self);
+    FCVSource := Value;
+    if Assigned(FCVSource) and (not(csDesigning in ComponentState)) then
+      FCVSource.AddReceiver(Self);
+  end;
 end;
 
-function TCVView.MatIsEmpty: Boolean;
+procedure TCVView.setMat(const Value: TMat);
 begin
-  Result := FMat.empty;
+  if not Assigned(FMat) then
+    New(FMat);
+  FMat^ := Value;
+end;
+
+procedure TCVView.SetSource(const Value: TObject);
+begin
+  Source := Value as TCVDataSource;
+end;
+
+procedure TCVView.TakeMat(const AMat: TMat);
+begin
+  if (ComponentState * [csDestroying, csDesigning]) = [] then
+    DrawMat(AMat);
 end;
 
 procedure TCVView.WMEraseBkgnd(var Message: TWMEraseBkgnd);
 begin
-  if (csDesigning in ComponentState) or (not isSourceEnabled) then
+  if (csDesigning in ComponentState) or MatIsEmpty then
     inherited;
 end;
 
 procedure TCVView.WMPaint(var Message: TWMPaint);
-Var
-  dc: HDC;
-  lpPaint: TPaintStruct;
 begin
-  Canvas.Lock;
-  dc := BeginPaint(Handle, lpPaint);
-  try
-    Canvas.Handle := dc;
-    if (csDesigning in ComponentState) or MatIsEmpty then
-    begin
-      inherited;
-
-      Canvas.Font.Color := clWindowText;
-
-      var
-        Text: string := Name + ': ' + ClassName;
-      var
-        TextOneHeight: Integer := Canvas.TextHeight(Text) + 5;
-      var
-        TextHeight: Integer := TextOneHeight * 2 - 5;
-      if not Assigned(Source) then
-        TextHeight := TextHeight + TextOneHeight;
-
-      Var
-        x: Integer := (ClientWidth - Canvas.TextWidth(Text)) div 2;
-      Var
-        y: Integer := (ClientHeight - TextHeight) div 2;
-      Canvas.TextOut(x, y, Text);
-
-      Text := '(' + ClientWidth.ToString + ',' + ClientHeight.ToString + ')';
-      x := (ClientWidth - Canvas.TextWidth(Text)) div 2;
-      y := y + TextOneHeight;
-      Canvas.TextOut(x, y, Text);
-      if not Assigned(Source) then
-      begin
-        Text := 'Source not defined';
-        x := (ClientWidth - Canvas.TextWidth(Text)) div 2;
-        y := y + TextOneHeight;
-        Canvas.Font.Color := clRed;
-        Canvas.TextOut(x, y, Text);
-      end;
-    end
-    else
-    begin
-      if not MatIsEmpty then
-      begin
-        try
-          if Assigned(OnBeforePaint) then
-            OnBeforePaint(Self, FMat);
-          if ipDraw(dc, FMat, PaintRect) then
-            if Assigned(OnAfterPaint) then
-              OnAfterPaint(Self, FMat);
-        finally
-          Canvas.Handle := 0;
-        end;
-      end
-      else
-        DefaultHandler(Message);
-    end;
-  finally
-    EndPaint(Handle, lpPaint);
-    Canvas.Unlock;
-  end;
+  if (csDesigning in ComponentState) then
+  begin
+    inherited;
+    PaintDisignInfo;
+  end
+  else if not MatIsEmpty then
+    PaintInRunTime
+  else
+    inherited;
 end;
 
 { TCVCaptureSource }
@@ -813,41 +860,44 @@ end;
 Var
   CVVideoCaptureAPIs: array [TCVVideoCaptureAPIs] of VideoCaptureAPIs = //
     ( //
-    CAP_ANY,           // !< Auto detect == 0
-    CAP_VFW,           // !< Video For Windows obsolete, removed)
-    CAP_V4L,           // !< V4L/V4L2 capturing support
-    CAP_V4L2,          // !< Same as CAP_V4L
-    CAP_FIREWIRE,      // !< IEEE 1394 drivers
-    CAP_FIREWARE,      // !< Same value as CAP_FIREWIRE
-    CAP_IEEE1394,      // !< Same value as CAP_FIREWIRE
-    CAP_DC1394,        // !< Same value as CAP_FIREWIRE
-    CAP_CMU1394,       // !< Same value as CAP_FIREWIRE
-    CAP_QT,            // !< QuickTime obsolete, removed)
-    CAP_UNICAP,        // !< Unicap drivers obsolete, removed)
-    CAP_DSHOW,         // !< DirectShow via videoInput)
-    CAP_PVAPI,         // !< PvAPI, Prosilica GigE SDK
-    CAP_OPENNI,        // !< OpenNI for Kinect)
-    CAP_OPENNI_ASUS,   // !< OpenNI for Asus Xtion)
-    CAP_ANDROID,       // !< Android - not used
-    CAP_XIAPI,         // !< XIMEA Camera API
-    CAP_AVFOUNDATION,  // !< AVFoundation framework for iOS OS X Lion will have the same API)
-    CAP_GIGANETIX,     // !< Smartek Giganetix GigEVisionSDK
-    CAP_MSMF,          // !< Microsoft Media Foundation via videoInput)
-    CAP_WINRT,         // !< Microsoft Windows Runtime using Media Foundation
-    CAP_INTELPERC,     // !< RealSense former Intel Perceptual Computing SDK)
-    CAP_REALSENSE,     // !< Synonym for CAP_INTELPERC
-    CAP_OPENNI2,       // !< OpenNI2 for Kinect)
-    CAP_OPENNI2_ASUS,  // !< OpenNI2 for Asus Xtion and Occipital Structure sensors)
+    CAP_ANY,         // !< Auto detect == 0
+    CAP_VFW,         // !< Video For Windows obsolete, removed)
+    CAP_V4L,         // !< V4L/V4L2 capturing support
+    CAP_V4L2,        // !< Same as CAP_V4L
+    CAP_FIREWIRE,    // !< IEEE 1394 drivers
+    CAP_FIREWARE,    // !< Same value as CAP_FIREWIRE
+    CAP_IEEE1394,    // !< Same value as CAP_FIREWIRE
+    CAP_DC1394,      // !< Same value as CAP_FIREWIRE
+    CAP_CMU1394,     // !< Same value as CAP_FIREWIRE
+    CAP_QT,          // !< QuickTime obsolete, removed)
+    CAP_UNICAP,      // !< Unicap drivers obsolete, removed)
+    CAP_DSHOW,       // !< DirectShow via videoInput)
+    CAP_PVAPI,       // !< PvAPI, Prosilica GigE SDK
+    CAP_OPENNI,      // !< OpenNI for Kinect)
+    CAP_OPENNI_ASUS, // !< OpenNI for Asus Xtion)
+    CAP_ANDROID,     // !< Android - not used
+    CAP_XIAPI,       // !< XIMEA Camera API
+    CAP_AVFOUNDATION,
+    // !< AVFoundation framework for iOS OS X Lion will have the same API)
+    CAP_GIGANETIX, // !< Smartek Giganetix GigEVisionSDK
+    CAP_MSMF,      // !< Microsoft Media Foundation via videoInput)
+    CAP_WINRT,     // !< Microsoft Windows Runtime using Media Foundation
+    CAP_INTELPERC, // !< RealSense former Intel Perceptual Computing SDK)
+    CAP_REALSENSE, // !< Synonym for CAP_INTELPERC
+    CAP_OPENNI2,   // !< OpenNI2 for Kinect)
+    CAP_OPENNI2_ASUS,
+    // !< OpenNI2 for Asus Xtion and Occipital Structure sensors)
     CAP_OPENNI2_ASTRA, // !< OpenNI2 for Orbbec Astra)
     CAP_GPHOTO2,       // !< gPhoto2 connection
     CAP_GSTREAMER,     // !< GStreamer
-    CAP_FFMPEG,        // !< Open and record video file or stream using the FFMPEG library
-    CAP_IMAGES,        // !< OpenCV Image Sequence e.g. img_%02d.jpg)
-    CAP_ARAVIS,        // !< Aravis SDK
-    CAP_OPENCV_MJPEG,  // !< Built-in OpenCV MotionJPEG codec
-    CAP_INTEL_MFX,     // !< Intel MediaSDK
-    CAP_XINE,          // !< XINE engine Linux)
-    CAP_UEYE           // !< uEye Camera API
+    CAP_FFMPEG,
+    // !< Open and record video file or stream using the FFMPEG library
+    CAP_IMAGES,       // !< OpenCV Image Sequence e.g. img_%02d.jpg)
+    CAP_ARAVIS,       // !< Aravis SDK
+    CAP_OPENCV_MJPEG, // !< Built-in OpenCV MotionJPEG codec
+    CAP_INTEL_MFX,    // !< Intel MediaSDK
+    CAP_XINE,         // !< XINE engine Linux)
+    CAP_UEYE          // !< uEye Camera API
   );
 
 constructor TCVCaptureSource.Create(AOwner: TComponent);
@@ -920,8 +970,10 @@ procedure TCVCaptureSource.Loaded;
 begin
   inherited;
   if not(csDesigning in ComponentState) then
+  begin
     if Enabled then
       StartCapture;
+  end;
 end;
 
 procedure TCVCaptureSource.OnNoDataCaptureThread(Sender: TObject);
@@ -938,7 +990,8 @@ end;
 procedure TCVCaptureSource.OnNotifyChange(Sender: TObject);
 begin
   StopCapture;
-  StartCapture;
+  if Enabled then
+    StartCapture;
 end;
 
 procedure TCVCaptureSource.OnNotifyDataCaptureThread(Sender: TObject; const AMat: TMat);
@@ -983,8 +1036,8 @@ begin
   if Assigned(FSourceThread) or (csDesigning in ComponentState) then
     Exit;
 
-  var
-    OldEnabled: Boolean := FEnabled;
+  // var
+  // OldEnabled: Boolean := FEnabled;
 
   if FOperationClass = TCVWebCameraSource then
   begin
@@ -1017,11 +1070,11 @@ begin
     FSourceThread.OnNoData := OnNoDataCaptureThread;
     FSourceThread.OnNotifyData := OnNotifyDataCaptureThread;
     FSourceThread.OnTerminate := OnTerminateCaptureThread;
-    if OldEnabled then
-    begin
-      FSourceThread.Start;
-      FEnabled := True;
-    end;
+    // if OldEnabled then
+    // begin
+    FSourceThread.Start;
+    FEnabled := True;
+    // end;
   end;
 end;
 

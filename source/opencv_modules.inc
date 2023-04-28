@@ -20,21 +20,21 @@
   limitations under the License.
 *)
 
-{$IFNDEF OPENCV_opencv_modules_HPP}
-{$DEFINE OPENCV_opencv_modules_HPP}
+{$IF not defined(OPENCV_OPENCV_MODULES_HPP)}
+{$DEFINE OPENCV_OPENCV_MODULES_HPP}
 
 
 // This definition means that OpenCV is built with enabled non-free code.
 // For example, patented algorithms for non-profit/non-commercial use only.
 (* #undef OPENCV_ENABLE_NONFREE *)
 
-{$DEFINE HAVE_OPENCV_CALIB3D}
 {$DEFINE HAVE_OPENCV_CORE}
+{$DEFINE HAVE_OPENCV_CALIB3D}
 {$DEFINE HAVE_OPENCV_DNN}
 {$DEFINE HAVE_OPENCV_FEATURES2D}
 {$DEFINE HAVE_OPENCV_FLANN}
 {$DEFINE HAVE_OPENCV_GAPI}
-{$DEFINE HAVE_OPENCV_HIGHGUI}
+{$DEFINE HAVE_OPENCV_HIGHGUI} {!!!}
 {$DEFINE HAVE_OPENCV_IMGCODECS}
 {$DEFINE HAVE_OPENCV_IMGPROC}
 {$DEFINE HAVE_OPENCV_ML}
@@ -45,4 +45,7 @@
 {$DEFINE HAVE_OPENCV_VIDEOIO}
 {$DEFINE HAVE_OPENCV_WORLD}
 
-{$ENDIF OPENCV_opencv_modules_HPP}
+{$ELSE}
+{$MESSAGE FATAL 'Duplicate included file - opencv_modules.inc'}
+
+{$IFEND} //OPENCV_OPENCV_MODULES_HPP

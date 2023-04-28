@@ -1,4 +1,4 @@
-(*
+﻿(*
   This file is part of Delphi-OpenCV-Class project.
   https://github.com/Laex/Delphi-OpenCV-Class
 
@@ -20,280 +20,258 @@
   limitations under the License.
 *)
 
-{$IFDEF OPENCV_CORE_UTILITY_H}
+{$IF defined(OPENCV_CORE_UTILITY_H) and (not defined(OPENCV_CORE_UTILITY_H_IMPL))}
+{$DEFINE OPENCV_CORE_UTILITY_H_IMPL}
+
+function setBreakOnError(flag: bool): bool;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_setBreakOnError(flag);
+{$IFEND}
+end;
+
+function redirectError(errCallback: TErrorCallback; userdata: Pointer = nil; prevUserdata: Pointer = nil): TErrorCallback;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_redirectError(errCallback, userdata, prevUserdata);
+{$IFEND}
+end;
+
+procedure setNumThreads(nthreads: int);
+begin
+{$IF not defined(PACKAGE)}
+  proc_setNumThreads(nthreads);
+{$IFEND}
+end;
+
+function getNumThreads: int;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getNumThreads;
+{$IFEND}
+end;
+
+function getThreadNum: int;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getThreadNum;
+{$IFEND}
+end;
 
 function getBuildInformation: String;
 begin
-  Result := _getBuildInformation^;
+{$IF not defined(PACKAGE)}
+  Result := func_getBuildInformation^;
+{$IFEND}
+end;
+
+function getVersionString: string;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getVersionString;
+{$IFEND}
+end;
+
+function getVersionMajor: int;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getVersionMajor;
+{$IFEND}
+end;
+
+function getVersionMinor: int;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getVersionMinor;
+{$IFEND}
+end;
+
+function getVersionRevision: int;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getVersionRevision;
+{$IFEND}
+end;
+
+function getTickCount: Int64;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getTickCount;
+{$IFEND}
+end;
+
+function getTickFrequency: Double;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getTickFrequency;
+{$IFEND}
+end;
+
+function getCPUTickCount: Int64;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getCPUTickCount;
+{$IFEND}
+end;
+
+function checkHardwareSupport(feature: int): bool;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_checkHardwareSupport(feature);
+{$IFEND}
+end;
+
+function getHardwareFeatureName(feature: int): string;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getHardwareFeatureName(feature);
+{$IFEND}
+end;
+
+function getCPUFeaturesLine: string;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getCPUFeaturesLine();
+{$IFEND}
+end;
+
+function getNumberOfCPUs: int;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_getNumberOfCPUs;
+{$IFEND}
+end;
+
+procedure setUseOptimized(onoff: bool);
+begin
+{$IF not defined(PACKAGE)}
+  proc_setUseOptimized(onoff);
+{$IFEND}
+end;
+
+function useOptimized: bool;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_useOptimized;
+{$IFEND}
+end;
+
+function findFileOrKeep(const relative_path: string; silentMode: Boolean = False): string;
+begin
+{$IF not defined(PACKAGE)}
+  Result := func_findFileOrKeep(relative_path, silentMode);
+{$IFEND}
+end;
+
+procedure addSamplesDataSearchPath(const path: String);
+begin
+{$IF not defined(PACKAGE)}
+  proc_addSamplesDataSearchPath(path);
+{$IFEND}
+end;
+
+procedure addSamplesDataSearchSubDirectory(const subdir: string);
+begin
+{$IF not defined(PACKAGE)}
+  proc_addSamplesDataSearchSubDirectory(subdir);
+{$IFEND}
+end;
+
+{ TTickMeter }
+
+class operator _TickMeter.Initialize(out Dest: _TickMeter);
+begin
+  Dest.reset();
+end;
+
+procedure _TickMeter.start();
+begin
+  startTime := getTickCount();
+end;
+
+procedure _TickMeter.stop();
+begin
+  Var
+    time: Int64 := getTickCount();
+  if (startTime = 0) then
+    Exit;
+  Inc(counter);
+  sumTime := sumTime + (time - startTime);
+  startTime := 0;
+end;
+
+function _TickMeter.getTimeTicks(): Int64;
+begin
+  Result := sumTime;
+end;
+
+function _TickMeter.getTimeMicro(): Double;
+begin
+  Result := getTimeMilli() * 1E3;
+end;
+
+function _TickMeter.getTimeMilli(): Double;
+begin
+  Result := getTimeSec() * 1E3;
+end;
+
+function _TickMeter.getTimeSec(): Double;
+begin
+  Result := getTimeTicks() / getTickFrequency();
+end;
+
+function _TickMeter.getCounter(): Int64;
+begin
+  Result := counter;
+end;
+
+function _TickMeter.getFPS(): Double;
+begin
+  Var
+    sec: Double := getTimeSec();
+  if (sec < DBL_EPSILON) then
+    Exit(0);
+  Result := counter / sec;
+end;
+
+function _TickMeter.getAvgTimeSec(): Double;
+begin
+  if (counter <= 0) then
+    Exit(0);
+  Result := getTimeSec() / counter;
+end;
+
+function _TickMeter.getAvgTimeMilli(): Double;
+begin
+  Result := getAvgTimeSec() * 1E3;
+end;
+
+procedure _TickMeter.reset();
+begin
+  startTime := 0;
+  sumTime := 0;
+  counter := 0;
 end;
 
 { TCommandLineParser }
 
-function TCommandLineParser.getDefaultByName(const name: string; out R: string): boolean;
-Var
-  i: Integer;
+function findFile(const relative_path: string; required: bool = true; silentMode: bool = False): String;
 begin
-  if getIndexByName(name, i) and (Length(Value[i]) > 0) then
-  begin
-    if Length(CmdValue[i]) > 0 then
-      R := CmdValue[i]
-    else
-      R := Value[i];
-    Exit(True);
-  end;
-  Result := False;
+{$IF not defined(PACKAGE)}
+  Result := func_findFile(relative_path, required, silentMode);
+{$IFEND}
 end;
 
-function TCommandLineParser.getIndexByName(const name: string; out Index: Integer): boolean;
-Var
-  i, j: Integer;
+{ AutoBuffer<T> }
+
+class operator AutoBuffer<T>.Initialize(out Dest: AutoBuffer<T>);
 begin
-  for i := 0 to High(CmdParam) do
-    for j := 0 to High(CmdParam[i]) do
-      if CmdParam[i][j] = name then
-      begin
-        Index := i;
-        Exit(True);
-      end;
-  Result := False;
+  Dest.ptr := AllocMem(1024 div sizeof(T) + 8);
 end;
 
-function TCommandLineParser.getIndexInput(out Index: Integer): boolean;
-Var
-  i, j: Integer;
+class operator AutoBuffer<T>.Finalize(var Dest: AutoBuffer<T>);
 begin
-  for i := 0 to High(CmdParam) do
-    for j := 0 to High(CmdParam[i]) do
-      if (Length(CmdParam[i][j]) > 0) and (CmdParam[i][j][1] = '@') then
-      begin
-        Index := i;
-        Exit(True);
-      end;
-  Result := False;
+  FreeMem(Dest.ptr);
 end;
 
-procedure TCommandLineParser.help;
-var
-  i, j: Integer;
-  n: boolean;
-begin
-  if Length(FAbout) > 0 then
-    WriteLn(FAbout);
-  Write('Usage: ', argv[0]);
-  if Length(CmdParam) > 0 then
-  begin
-    n := getIndexInput(i);
-    if (Length(CmdParam) > 1) or (not n) then
-      Write(' [params] ');
-    if n then
-    begin
-      if Length(Value[i]) <> 0 then
-        Write('[')
-      else
-        Write('<');
-      if Length(Info[i]) <> 0 then
-        Write(Info[i])
-      else
-        Write('input');
-      if Length(Value[i]) <> 0 then
-        write(' default:', Value[i], ']')
-      else
-        write('>');
-    end;
-  end;
-  WriteLn;
-  WriteLn;
-
-  for i := 0 to High(CmdParam) do
-    if (Length(CmdParam[i]) > 0) and (CmdParam[i][0][1] <> '@') then
-    begin
-      write(#9);
-      for j := 0 to High(CmdParam[i]) do
-      begin
-        Write('-', CmdParam[i][j]);
-        if j < High(CmdParam[i]) then
-          Write(', ');
-      end;
-      if Length(Value[i]) > 0 then
-        write(' (default:', Value[i], ')');
-      WriteLn;
-      if Length(Info[i]) > 0 then
-        printf(#9#9 + Info[i] + #13#10);
-    end;
-end;
-
-function TCommandLineParser.get<T>(const name: string): T;
-Var
-  R: string;
-begin
-  Result := default (T);
-  if getDefaultByName(name, R) then
-  begin
-    if TypeInfo(T) = TypeInfo(Int) then
-    begin
-      var
-        Code: Integer;
-      Val(R, pInt(@Result)^, Code);
-    end
-    else if TypeInfo(T) = TypeInfo(string) then
-    begin
-      Result := TValue(R).AsType<T>;
-    end
-    else if TypeInfo(T) = TypeInfo(float) then
-    begin
-      var
-        Code: Integer;
-      Val(R, pfloat(@Result)^, Code);
-    end
-    else if TypeInfo(T) = TypeInfo(double) then
-    begin
-      var
-        Code: Integer;
-      Val(R, pdouble(@Result)^, Code);
-    end
-    else if TypeInfo(T) = TypeInfo(bool) then
-    begin
-      if (R = '1') or (R = 'true') or (R = 'TRUE') then
-        Result := TValue(True).AsType<T>
-      else
-        Result := TValue(False).AsType<T>;
-    end;
-  end;
-end;
-
-class operator TCommandLineParser.Implicit(const keys: String): TCommandLineParser;
-begin
-  Result := TCommandLineParser.Init(keys);
-end;
-
-class function TCommandLineParser.Init(const keys: String): TCommandLineParser;
-begin
-  Result.InternalInit(keys);
-end;
-
-function TCommandLineParser.Trim(const Text: String): String;
-begin
-  Result := Text;
-  While (Length(Result) > 0) and ((Result[1] = #9) or (Result[1] = ' ')) do
-    Delete(Result, 1, 1);
-  While (Length(Result) > 0) and ((Result[Length(Result)] = #9) or (Result[Length(Result)] = ' ')) do
-    Delete(Result, Length(Result), 1);
-end;
-
-procedure TCommandLineParser.InternalInit(const keys: String);
-Var
-  i, j, k: Integer;
-  s: string;
-  i1, j1, k1: Integer;
-  s1, s2, s3: string;
-  T: string;
-  C: TArray<string>;
-begin
-  SetLength(CmdParam, 0);
-  SetLength(Value, 0);
-  SetLength(Info, 0);
-
-  i := 1;
-  While i <= Length(keys) do
-  begin
-    j := Pos('{', keys, i);
-    if j > 0 then
-    begin
-      k := Pos('}', keys, j + 1);
-      if k > 0 then
-      begin
-        s := Trim(Copy(keys, j + 1, k - j - 1));
-        i1 := Pos('|', s);
-        if i1 > 0 then
-        begin
-          s1 := Trim(Copy(s, 1, i1 - 1));
-          j1 := Pos('|', s, i1 + 1);
-          if j1 > 0 then
-          begin
-            s2 := Trim(Copy(s, i1 + 1, j1 - i1 - 1));
-            s3 := Trim(Copy(s, j1 + 1, Length(s)));
-
-            SetLength(C, 0);
-
-            while Length(s1) > 0 do
-            begin
-              k1 := Pos(' ', s1);
-              if k1 > 0 then
-              begin
-                T := Trim(Copy(s1, 1, k1 - 1));
-                Delete(s1, 1, k1);
-              end
-              else
-              begin
-                T := s1;
-                SetLength(s1, 0);
-              end;
-              C := C + [T];
-            end;
-
-            CmdParam := CmdParam + [C];
-            Value := Value + [s2];
-            Info := Info + [s3];
-          end;
-        end;
-      end
-      else
-        Break;
-    end
-    else
-      Break;
-    i := k + 1;
-  end;
-
-  SetLength(CmdValue, Length(Value));
-
-  ParseCommand;
-end;
-
-procedure TCommandLineParser.ParseCommand;
-Var
-  i, j: Integer;
-  s: string;
-begin
-  i := 1;
-  While i <= ParamCount do
-  begin
-    s := ParamStr(i);
-    if s[1] <> '-' then
-    begin
-      if getIndexInput(j) then
-        CmdValue[j] := s;
-    end
-    else
-    begin
-      while (Length(s) > 0) and (s[1] = '-') do
-        Delete(s, 1, 1);
-      if (Length(s) > 0) and getIndexByName(s, j) then
-      begin
-        if i < ParamCount then
-          CmdValue[j] := ParamStr(i + 1);
-        Inc(i);
-      end;
-    end;
-    Inc(i);
-  end;
-end;
-
-procedure TCommandLineParser.About(const Text: String);
-begin
-  FAbout := Text;
-end;
-
-function TCommandLineParser.has(const name: String): boolean;
-var
-  i: Integer;
-begin
-  Result := getIndexByName(Name, i);
-end;
-
-procedure TCommandLineParser.printMessage();
-begin
-  help;
-end;
-
-{$ENDIF OPENCV_CORE_UTILITY_H}
+{$IFEND OPENCV_CORE_UTILITY_H}

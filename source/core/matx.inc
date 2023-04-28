@@ -20,17 +20,17 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_CORE_MATX_HPP}
+{$if not defined(OPENCV_CORE_MATX_HPP)}
 {$define OPENCV_CORE_MATX_HPP}
 
 {$if (not defined(WIN64)) and (CompilerVersion < 34.0)}
 #  error matx.inc header must be compiled as Delphi 10.4 Sydney WIN64
 {$ifend}
 
-{$I 'core/cvdef.inc'}
-{$I 'core/base.inc'}
-{$I 'core/traits.inc'}
-{$I 'core/saturate.inc'}
+{$IF not defined(OPENCV_CORE_CVDEF_H)}{$I 'core/cvdef.inc'}{$ifend}
+{$IF not defined(OPENCV_CORE_BASE_HPP)}{$I 'core/base.inc'}{$ifend}
+{$IF not defined(OPENCV_CORE_TRAITS_HPP)}{$I 'core/traits.inc'}{$ifend}
+{$if not defined(OPENCV_CORE_SATURATE_HPP)}{$I 'core/saturate.inc'}{$ifend}
 
 //{$I <initializer_list>
 
@@ -406,6 +406,10 @@ public:
     property Items[const Index: integer]: uchar read getItem write setItem; default;
     class operator Implicit(const a: TArray<uchar>): TVec3b; {$IFDEF USE_INLINE}inline; {$ENDIF}
   end;
+
+function Vec3b(const a,b,c:uchar):TVec3b; {$IFDEF USE_INLINE}inline; {$ENDIF}
+
+Type
    TVec4b   = array[0..4-1] of uchar;
 
    TVec2s   = array[0..2-1] of short;
@@ -431,7 +435,7 @@ public:
    TVec2d   = array[0..2-1] of double;
    TVec3d   = array[0..3-1] of double;
    TVec4d   = array[0..4-1] of double;
-   TVec6d   = array[0..6-1] of double;
+   TVec6d   = array[0..6-1] of double;   
 
 
 (** @} *)
@@ -1509,4 +1513,8 @@ template<typename _Tp> inline Vec<_Tp, 4>& operator *= (Vec<_Tp, 4>& v1, const V
 
 } // cv
 *)
-{$endif OPENCV_CORE_MATX_HPP}
+
+{$ELSE}
+{$MESSAGE FATAL 'Duplicate included file - core/matx.inc'}
+
+{$ifend} //OPENCV_CORE_MATX_HPP

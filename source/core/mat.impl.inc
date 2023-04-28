@@ -20,28 +20,38 @@
   limitations under the License.
 *)
 
-{$IFDEF OPENCV_CORE_MAT_HPP}
+{$IF defined(OPENCV_CORE_MAT_HPP) and (not defined(OPENCV_CORE_MAT_HPP_IMPL))}
+{$DEFINE OPENCV_CORE_MAT_HPP_IMPL}
 { TMat }
 
 class operator TMat.Initialize(out Dest: TMat);
 begin
-  Constructor_Mat(Dest);
+{$IF not defined(PACKAGE)}
+  constructor_CV_MAT_19(Dest);
+{$IFEND}
 end;
 
 class operator TMat.Finalize(var Dest: TMat);
 begin
-  Destructor_Mat(Dest);
+{$IF not defined(PACKAGE)}
+  Destructor_cv_Mat(Dest);
+{$IFEND}
 end;
 
 class operator TMat.assign(var Dest: TMat; const [ref] Src: TMat);
 begin
+{$IF not defined(PACKAGE)}
   if @Dest <> @Src then
-    Operator_Mat_Assign_Const_Mat(Dest, Src);
+    operator_CV_MAT_assign_1(Dest, Src);
+{$IFEND}
 end;
 
 function TMatHelper.setTo(const value: TInputArray; const mask: TInputArray { =noArray() } ): TMat;
 begin
-  Result := setTo_Mat(Self, value, mask)^;
+{$IF not defined(PACKAGE)}
+  // Result := class_func_CV_MAT_setTo(Self, value, mask)^;
+  Result := class_func_CV_MAT_setTo(Self, value, mask)^;
+{$IFEND}
 end;
 
 function TMatHelper.setTo(const value: TInputArray): TMat;
@@ -51,32 +61,45 @@ end;
 
 function TMatHelper.reshape(cn: int; newndims: int; const newsz: pInt): TMat;
 begin
-  Result := reshape_Mat(Self, cn, newndims, newsz);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_reshape_2(Self, cn, newndims, newsz);
+{$IFEND}
 end;
 
 class operator TMatHelper.Implicit(const m: TMatExpr): TMat;
 begin
-  Operator_Mat_Assign_MatExpr(Result, m);
+{$IF not defined(PACKAGE)}
+  operator_CV_MAT_assign_3(Result, m);
+{$IFEND}
 end;
 
 function TMatHelper.clone: TMat;
 begin
-  clone_Mat(Self, Result);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_clone(Self)^;
+{$IFEND}
 end;
 
 procedure TMatHelper.convertTo(const m: TOutputArray; rtype: int; alpha: double = 1; beta: double = 0);
 begin
-  convertTo_Mat(Self, m, rtype, alpha, beta);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_convertTo(Self, m, rtype, alpha, beta);
+{$IFEND}
 end;
 
 procedure TMatHelper.Create(const size: TSize; &type: int);
 begin
-  create_Mat(Self, size, &type);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_create_3(Self, size, &type);
+{$IFEND}
 end;
 
 function TMatHelper.diag(d: int): TMat;
 begin
-  diag_Mat(Self, Result, d);
+{$IF not defined(PACKAGE)}
+  // diag_Mat(Self, Result, d);
+  Result := class_func_CV_MAT_diag(Self, d);
+{$IFEND}
 end;
 
 function TMatHelper.mat(const roi: TRect): TMat;
@@ -86,65 +109,96 @@ end;
 
 function TMatHelper.isContinuous: BOOL;
 begin
-  Result := isContinuous_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_isContinuous(Self);
+{$IFEND}
 end;
 
 function TMatHelper.isSubmatrix: BOOL;
 begin
-  Result := isSubmatrix_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_isSubmatrix(Self);
+{$IFEND}
 end;
 
 class operator TMatHelper.BitwiseAnd(const a, b: TMat): TMat;
 begin
+{$IF not defined(PACKAGE)}
   bitwise_and(a, b, Result);
+{$IFEND}
 end;
 
 class operator TMatHelper.BitwiseAnd(const a: TMat; const b: TScalar): TMatExpr;
 begin
-  operator_MatExpr_BitwiseAnd_Mat_Scalar(Result, a, b);
+{$IF not defined(PACKAGE)}
+  // operator_MatExpr_BitwiseAnd_Mat_Scalar(Result, a, b);
+  Result := operator_CV_and_5(a, b);
+{$IFEND}
 end;
 
 class operator TMatHelper.LogicalNot(const m: TMat): TMatExpr;
 begin
-  operator_MatExpr_LogicalNot_Mat(Result, m);
+{$IF not defined(PACKAGE)}
+  // operator_MatExpr_LogicalNot_Mat(Result, m);
+  Result := operator_CV_not_1(m);
+{$IFEND}
 end;
 
 class operator TMatHelper.GreaterThanOrEqual(const a: TMat; const b: int): TMatExpr;
 begin
-  operator_MatExpr_GreaterThanOrEqual_double(Result, a, b);
+{$IF not defined(PACKAGE)}
+  // operator_MatExpr_GreaterThanOrEqual_double(Result, a, b);
+  Result := operator_CV_great_eq_4(a, b);
+{$IFEND}
 end;
 
 class operator TMatHelper.Multiply(const a: TMat; const b: double): TMatExpr;
 begin
-  operator_MatExpr_Mul_Mat_double(Result, a, b);
+{$IF not defined(PACKAGE)}
+  // operator_MatExpr_Mul_Mat_double(Result, a, b);
+  Result := operator_CV_mul_9(a, b);
+{$IFEND}
 end;
 
 class operator TMatHelper.Multiply(const a: TMat; const b: TMat): TMatExpr;
 begin
-  operator_MatExpr_Mul_Mat_Mat(Result, a, b);
+{$IF not defined(PACKAGE)}
+  // operator_MatExpr_Mul_Mat_Mat(Result, a, b);
+  Result := operator_CV_mul_7(a, b);
+{$IFEND}
 end;
 
 class operator TMatHelper.Add(const a: TMat; const s: TScalar): TMatExpr;
 begin
-  operator_MatExpr_Add_Mat_Scalar(Result, a, s);
+{$IF not defined(PACKAGE)}
+  // operator_MatExpr_Add_Mat_Scalar(Result, a, s);
+  Result := operator_CV_plus_10(a, s);
+{$IFEND}
 end;
 
 class operator TMatHelper.Add(const a: TMat; const s: TMatExpr): TMat;
-Var
-  r: TMatExpr;
+// Var
+// r: TMatExpr;
 begin
-  operator_MatExpr_Add_Mat_MatExpr(r, a, s);
-  Result := r;
+{$IF not defined(PACKAGE)}
+  // operator_MatExpr_Add_Mat_MatExpr(r, a, s);
+  // Result := r;
+  Result := operator_CV_plus_9(a, s);
+{$IFEND}
 end;
 
 class function TMatHelper.mat(const size: TSize; &type: int): TMat;
 begin
-  Result := Constructor_Mat(Result, size, &type)^;
+{$IF not defined(PACKAGE)}
+  constructor_CV_MAT_16(Result, size, &type);
+{$IFEND}
 end;
 
 class function TMatHelper.mat(const size: TSize; &type: int; const s: TScalar): TMat;
 begin
-  Constructor_Mat(Result, size, &type, s);
+{$IF not defined(PACKAGE)}
+  constructor_CV_MAT_17(Result, size, &type, s);
+{$IFEND}
 end;
 
 class function TMatHelper.mat(rows, cols, &type: int): TMat;
@@ -179,18 +233,24 @@ end;
 
 class function TMatHelper.mat(rows, cols, &type: int; Data: Pointer; step: size_t): TMat;
 begin
-  Result := Constructor_Mat(Result, rows, cols, &type, Data, step)^;
+{$IF not defined(PACKAGE)}
+  constructor_CV_MAT_12(Result, rows, cols, &type, Data, step);
+{$IFEND}
 end;
 
 class function TMatHelper.mat: TMat;
 begin
+{$IF not defined(PACKAGE)}
   // Result := Constructor_Mat(Result)^;
-  Constructor_Mat(Result);
+  constructor_CV_MAT_19(Result);
+{$IFEND}
 end;
 
 class function TMatHelper.mat(const m: TMat; const roi: TRect): TMat;
 begin
-  Result := Constructor_Mat(Result, m, roi)^;
+{$IF not defined(PACKAGE)}
+  constructor_CV_MAT_2(Result, m, roi);
+{$IFEND}
 end;
 
 function TMatHelper.pT<T>(const i0: int): Pointer;
@@ -221,7 +281,9 @@ end;
 
 procedure TMatHelper.release;
 begin
-  release_Mat(Self);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_release(Self);
+{$IFEND}
 end;
 
 procedure TMatHelper.st<T>(const i0, i1: int; const v: T);
@@ -264,17 +326,23 @@ end;
 
 function TMatHelper.step1(i: int): size_t;
 begin
-  Result := step1_Mat(Self, i);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_step1(Self, i);
+{$IFEND}
 end;
 
 procedure TMatHelper.addref;
 begin
-  addref_Mat(Self);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_addref(Self);
+{$IFEND}
 end;
 
 procedure TMatHelper.assign(const s: TScalar);
 begin
-  Operator_Mat_Assign_Scalar(Self, s);
+{$IF not defined(PACKAGE)}
+  operator_CV_MAT_assign_2(Self, s);
+{$IFEND}
 end;
 
 function TMatHelper.at<T>(const i0, i1: int): T;
@@ -314,62 +382,88 @@ end;
 
 function TMatHelper.channels: int;
 begin
-  Result := channels_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_channels(Self);
+{$IFEND}
 end;
 
 function TMatHelper.checkVector(elemChannels, depth: int; requireContinuous: BOOL): int;
 begin
-  Result := checkVector_Mat(Self, elemChannels, depth, requireContinuous);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_checkVector(Self, elemChannels, depth, requireContinuous);
+{$IFEND}
 end;
 
 procedure TMatHelper.Create(rows, cols, &type: int);
 begin
-  Constructor_Mat(Self, rows, cols, &type);
+{$IF not defined(PACKAGE)}
+  constructor_CV_MAT_10(Self, rows, cols, &type);
+{$IFEND}
 end;
 
 function TMatHelper.depth: int;
 begin
-  Result := depth_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_depth(Self);
+{$IFEND}
 end;
 
 function TMatHelper.elemSize: size_t;
 begin
-  Result := elemSize_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_elemSize(Self);
+{$IFEND}
 end;
 
 function TMatHelper.elemSize1: size_t;
 begin
-  Result := elemSize1_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_elemSize1(Self);
+{$IFEND}
 end;
 
 function TMatHelper.empty: BOOL;
 begin
-  Result := empty_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_empty(Self);
+{$IFEND}
 end;
 
 function TMatHelper.total(startDim, endDim: int): size_t;
 begin
-  Result := total_Mat(Self, startDim, endDim);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_total(Self, startDim, endDim);
+{$IFEND}
 end;
 
 function TMatHelper.total: size_t;
 begin
-  Result := total_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_total_1(Self);
+{$IFEND}
 end;
 
 function TMatHelper.&type: int;
 begin
-  Result := type_Mat(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_MAT_type(Self);
+{$IFEND}
 end;
 
 class function TMatHelper.zeros(const rows, cols: int; &type: int): TMatExpr;
 begin
-  zeros_Mat(Result, rows, cols, &type);
+{$IF not defined(PACKAGE)}
+  // zeros_Mat(Result, rows, cols, &type);
+  class_proc_CV_MAT_zeros(Result, rows, cols, &type);
+{$IFEND}
 end;
 
 class function TMatHelper.zeros(const size: TSize; &type: int): TMatExpr;
 begin
-  zeros_Mat(Result, size, &type);
+{$IF not defined(PACKAGE)}
+  // zeros_Mat(Result, size, &type);
+  class_proc_CV_MAT_zeros_2(Result, size, &type);
+{$IFEND}
 end;
 
 class function TMatHelper.mat<T>(const vec: Vector<T>; copyData: BOOL): TMat;
@@ -392,22 +486,30 @@ end;
 
 procedure TMatHelper.copyTo(m: TOutputArray);
 begin
-  copyTo_Mat(Self, m);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_copyTo(Self, m);
+{$IFEND}
 end;
 
 procedure TMatHelper.copyTo(m: TOutputArray; mask: TInputArray);
 begin
-  copyTo_Mat(Self, m, mask);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_copyTo_1(Self, m, mask);
+{$IFEND}
 end;
 
 class function TMatHelper.eye(rows, cols, &type: int): TMatExpr;
 begin
-  eye_Mat(Result, rows, cols, &type);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_eye(Result, rows, cols, &type);
+{$IFEND}
 end;
 
 class function TMatHelper.eye(size: TSize; &type: int): TMatExpr;
 begin
-  eye_Mat(Result, size, &type);
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_eye_1(Result, size, &type);
+{$IFEND}
 end;
 
 class operator TMatHelper.Implicit(const v: Vector<TPoint>): TMat;
@@ -417,27 +519,37 @@ end;
 
 class function TMatHelper.ones(rows, cols, &type: int): TMatExpr;
 begin
-  Result := ones_Mat(Result, rows, cols, &type)^;
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_ones(Result, rows, cols, &type);
+{$IFEND}
 end;
 
 class function TMatHelper.mat(rows, cols, &type: int; const s: TScalar): TMat;
 begin
-  Result := Constructor_Mat(Result, rows, cols, &type, s)^;
+{$IF not defined(PACKAGE)}
+  constructor_CV_MAT_11(Result, rows, cols, &type, s);
+{$IFEND}
 end;
 
 class function TMatHelper.ones(ndims: int; const sz: pInt; &type: int): TMatExpr;
 begin
-  Result := ones_Mat(Result, ndims, sz, &type)^;
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_ones_1(Result, ndims, sz, &type);
+{$IFEND}
 end;
 
 class function TMatHelper.ones(size: TSize; &type: int): TMatExpr;
 begin
-  Result := ones_Mat(Result, size, &type)^;
+{$IF not defined(PACKAGE)}
+  class_proc_CV_MAT_ones_2(Result, size, &type);
+{$IFEND}
 end;
 
 class operator TMatHelper.Subtract(const m: TMat; const s: TScalar): TMatExpr;
 begin
-  operator_MatExpr_Subtract_Mat_MatExpr(Result, m, s);
+{$IF not defined(PACKAGE)}
+  operator_CV_minus_12(Result, m, s);
+{$IFEND}
 end;
 
 function TMatHelper.ptr(const i0: int): puchar;
@@ -472,7 +584,9 @@ end;
 
 class function TMatHelper.mat(const m: TMat; const rowRange: TRange; const colRange: TRange { =Range::all() } ): TMat;
 begin
-  Constructor_Mat(Result, m, rowRange, colRange);
+{$IF not defined(PACKAGE)}
+  constructor_CV_MAT_4(Result, m, rowRange, colRange);
+{$IFEND}
 end;
 
 class function TMatHelper.mat(const m: TMat; const rowRange: TRange): TMat;
@@ -487,36 +601,65 @@ end;
 
 class operator TMatHelper.Add(const a: TMatExpr; const s: TMat): TMatExpr;
 begin
-  operator_MatExpr_Add_MatExpr_Mat(Result, a, s);
+{$IF not defined(PACKAGE)}
+  operator_CV_plus_5(Result, a, s);
+{$IFEND}
+end;
+
+class operator TMatHelper.Add(const a, b: TMat): TMatExpr;
+begin
+{$IF not defined(PACKAGE)}
+  operator_CV_plus_8(Result, a, b);
+{$IFEND}
 end;
 
 { TMatExpr }
 
 class operator TMatExpr.assign(var Dest: TMatExpr; const [ref] Src: TMatExpr);
 begin
-  Operator_MatExpr_Assign_Const_MatExpr(Dest, Src);
+{$IF not defined(PACKAGE)}
+  operator_CV_MATEXPR_assign_1(Dest, Src);
+{$IFEND}
 end;
 
 class operator TMatExpr.Finalize(var Dest: TMatExpr);
 begin
-  Destructor_MatExpr(Dest);
+{$IF not defined(PACKAGE)}
+  destructor_CV_MATEXPR(Dest);
+{$IFEND}
 end;
 
 class operator TMatExpr.Initialize(out Dest: TMatExpr);
 begin
-  constructor_MatExpr(Dest);
+{$IF not defined(PACKAGE)}
+  constructor_CV_MATEXPR_4(Dest);
+{$IFEND}
+end;
+
+class operator TMatExpr.Multiply(const a: TMatExpr; const b: double): TMatExpr;
+begin
+{$IF not defined(PACKAGE)}
+  operator_CV_mul_6(Result, a, b);
+{$IFEND}
 end;
 
 function TMatExprHelper.size: TSize;
 begin
-  MatExpr_size(Self, Result);
+{$IF not defined(PACKAGE)}
+  Var
+    T: UInt64;
+  class_func_CV_MATEXPR_size(Self, T);
+  Result := T;
+{$IFEND}
 end;
 
 { TInputArray }
 
 class function TInputArray.InputArray(const m: TMat): TInputArray;
 begin
-  Constructor_InputArray(Result, m);
+{$IF not defined(PACKAGE)}
+  constructor_CV__INPUTARRAY_8(Result, m);
+{$IFEND}
 end;
 
 class operator TInputArray.Implicit(const m: TMat): TInputArray;
@@ -526,7 +669,9 @@ end;
 
 class function TInputArray.InputArray(const m: TMatExpr): TInputArray;
 begin
-  Constructor_InputArray(Result, m);
+{$IF not defined(PACKAGE)}
+  constructor_CV__INPUTARRAY_9(Result, m);
+{$IFEND}
 end;
 
 class operator TInputArray.Implicit(const m: TMatExpr): TInputArray;
@@ -536,32 +681,45 @@ end;
 
 function TInputArray.getMat(idx: int): TMat;
 begin
-  getMat_InputArray(Self, Result, idx);
+{$IF not defined(PACKAGE)}
+  class_func_CV__INPUTARRAY_getMat(Self, Result, idx);
+{$IFEND}
 end;
 
 function TInputArray.getObj: Pointer;
 begin
-  Result := getObj_InputArray(Self);
+{$IF not defined(PACKAGE)}
+  class_proc_CV__INPUTARRAY_getObj(Self, Result);
+{$IFEND}
 end;
 
 class operator TInputArray.Initialize(out Dest: TInputArray);
 begin
-  Constructor_InputArray(Dest);
+{$IF not defined(PACKAGE)}
+  constructor_CV__INPUTARRAY_12(Dest);
+{$IFEND}
 end;
 
 class operator TInputArray.Finalize(var Dest: TInputArray);
 begin
-  Destructor_InputArray(Dest);
+{$IF not defined(PACKAGE)}
+  destructor_CV__INPUTARRAY(Dest);
+{$IFEND}
 end;
 
 function TInputArray.isMat: BOOL;
 begin
-  Result := isMat_InputArray(Self);
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV__INPUTARRAY_isMat(Self);
+{$IFEND}
 end;
 
 class function TInputArray.noArray: TInputArray;
 begin
-  noArray_InputOutputArray(TInputOutputArray(Result));
+{$IF not defined(PACKAGE)}
+  // noArray_InputOutputArray(TInputOutputArray(Result));
+  Result := TInputOutputArray(func_noArray()^);
+{$IFEND}
 end;
 
 class operator TInputArray.Implicit(const v: Vector < Vector < TPoint >> ): TInputArray;
@@ -627,6 +785,14 @@ begin
   Result.sz := size(1, 4);
 end;
 
+class operator TInputArray.Implicit(const v: TVec3b): TInputArray;
+begin
+  // { init(FIXED_TYPE + FIXED_SIZE + MATX + traits::Type<_Tp>::value + ACCESS_READ, &mtx, Size(n, m)); }
+  Result.flags := int(FIXED_TYPE) + int(MATX) + TTraits.&type<uchar>.value + int(ACCESS_READ);
+  Result.Obj := @v;
+  Result.sz := size(1, 3);
+end;
+
 class operator TInputArrayHelper.Implicit(const v: TMat1i): TInputArray;
 begin
   Result.flags := int(FIXED_TYPE) + int(mat) + TTraits.&type<int>.value + int(ACCESS_READ);
@@ -640,21 +806,29 @@ begin
   Result.Obj := @v;
   Result.sz := size(0, 0);
 end;
+
 { TOutputArray }
 
 class function TOutputArrayHelper.noArray: TOutputArray;
 begin
-  noArray_InputOutputArray(TInputOutputArray(Result));
+{$IF not defined(PACKAGE)}
+  // noArray_InputOutputArray(TInputOutputArray(Result));
+  Result := TOutputArray(func_noArray()^);
+{$IFEND}
 end;
 
 class function TOutputArrayHelper.OutputArray(const vec: Vector<TMat>): TOutputArray;
 begin
-  Constructor_OutputArray(Result, vec);
+{$IF not defined(PACKAGE)}
+  constructor_CV__OUTPUTARRAY_1(Result, vec);
+{$IFEND}
 end;
 
 class function TOutputArrayHelper.OutputArray(const m: TMat): TOutputArray;
 begin
-  Constructor_OutputArray(Result, m);
+{$IF not defined(PACKAGE)}
+  constructor_CV__OUTPUTARRAY_6(Result, m);
+{$IFEND}
 end;
 
 class operator TOutputArrayHelper.Implicit(const m: TMat): TOutputArray;
@@ -739,12 +913,17 @@ end;
 
 procedure TInputOutputArrayHelper.InputOutputArray(const m: TMat);
 begin
-  Constructor_InputOutputArray(Self, m);
+{$IF not defined(PACKAGE)}
+  constructor_CV__INPUTOUTPUTARRAY_5(Self, m);
+{$IFEND}
 end;
 
 class function TInputOutputArrayHelper.noArray: TInputOutputArray;
 begin
-  noArray_InputOutputArray(Result);
+{$IF not defined(PACKAGE)}
+  // noArray_InputOutputArray(Result);
+  Result := TInputOutputArray(func_noArray()^);
+{$IFEND}
 end;
 
 class operator TInputOutputArrayHelper.Implicit(const IOA: TInputOutputArray): TInputArray;
@@ -787,7 +966,12 @@ end;
 
 class operator TMatSizeHelper.Implicit(const m: TMatSize): TSize;
 begin
-  operator_MatSize_MatSizeToSize(m, Result);
+{$IF not defined(PACKAGE)}
+  Var
+    T: UInt64;
+  operator_CV_MATSIZE_explicit(m, T);
+  Result := T;
+{$IFEND}
 end;
 
 { TMatStep }
@@ -897,4 +1081,4 @@ begin
   Result := a.FMat;
 end;
 
-{$ENDIF}
+{$IFEND}

@@ -20,19 +20,43 @@
   limitations under the License.
 *)
 
-{$IFDEF OPENCV_CORE_CVDEF_H}
+{$IF defined(OPENCV_CORE_CVDEF_H) and (not defined(OPENCV_CORE_CVDEF_H_IMPL))}
+{$DEFINE  OPENCV_CORE_CVDEF_H_IMPL}
 
-function MIN(a, b: Int): Int;
+function cvMIN(a, b: Int): Int;
 begin
   Result := System.Math.MIN(a, b);
 end;
 
-function MAX(a, b: Int): Int;
+function cvMAX(a, b: Int): Int;
 begin
   Result := System.Math.MAX(a, b);
 end;
 
-{$i core/hal/interface.impl.inc}
-{$i core/fast_math.impl.inc}
+function CV_MAT_TYPE(flags:int):int;
+begin
+  Result:= ((flags) and CV_MAT_TYPE_MASK);
+end;
 
-{$ENDIF OPENCV_CORE_CVDEF_H_IMPL}
+function CV_ELEM_SIZE1(&type:int):int;
+begin
+  // CV_ELEM_SIZE1(type) = ((0x28442211 >> CV_MAT_DEPTH(type)*4) & 15);
+  Result := (($28442211 shr CV_MAT_DEPTH(&type)*4) and 15);
+end;
+
+function CV_MAT_CN(flags:int):int;
+begin
+  // CV_MAT_CN(flags)       = ((((flags) & CV_MAT_CN_MASK) >> CV_CN_SHIFT) + 1);
+  Result := ((((flags) and CV_MAT_CN_MASK) shr CV_CN_SHIFT) + 1);
+end;
+
+function CV_ELEM_SIZE(&type:int):int;
+begin
+    // CV_ELEM_SIZE(type) =(CV_MAT_CN(type)*CV_ELEM_SIZE1(type));
+  Result := CV_MAT_CN(&type)*CV_ELEM_SIZE1(&type);
+end;
+
+{$if defined(OPENCV_CORE_HAL_INTERFACE_H) and (not defined(OPENCV_CORE_HAL_INTERFACE_H_IMPL))}{$i core/hal/interface.impl.inc}{$ifend}
+{$if defined(OPENCV_CORE_FAST_MATH_HPP) and (not defined(OPENCV_CORE_FAST_MATH_HPP_IMPL))}{$i core/fast_math.impl.inc}{$ifend}
+
+{$IFEND OPENCV_CORE_CVDEF_H_IMPL}

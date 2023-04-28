@@ -20,12 +20,12 @@
   limitations under the License.
 *)
 
-{$ifndef OPENCV_MINIFLANN_HPP}
+{$if not defined(OPENCV_MINIFLANN_HPP)}
 {$define OPENCV_MINIFLANN_HPP}
 
 //! @cond IGNORED
 
-{$I 'core.inc'}
+{$IF not defined(OPENCV_CORE_HPP)}{$I 'core.inc'}{$ifend}
 {$I 'flann/defines.inc'}
 
 //namespace cv
@@ -162,4 +162,4 @@ Type
 
 //! @endcond
 
-{$endif}
+{$ifend}
