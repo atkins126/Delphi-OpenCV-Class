@@ -1,4 +1,4 @@
-(*
+п»ї(*
   This file is part of Delphi-OpenCV-Class project.
   https://github.com/Laex/Delphi-OpenCV-Class
 
@@ -26,7 +26,7 @@ unit CVClass;
 
 interface
 
-Uses
+uses
   WinApi.Windows,
   WinApi.Messages,
   System.Types,
@@ -36,11 +36,12 @@ Uses
   System.SyncObjs,
   VCL.Controls,
   VCL.Graphics,
-  VCL.Themes,
+  VCL.Direct2D,
+  D2D1,
   cpp.utils,
   cv.opencv;
 
-Type
+type
 
   TMat = cv.opencv.TMat;
 
@@ -58,14 +59,14 @@ Type
     function getEnabled: Boolean;
     procedure setEnabled(const Value: Boolean);
 
-    function getObjectName: String;
+    function getObjectName: string;
     // function getMat: TMat;
     // function GetName: string;
     // function getHeight: Integer;
     // function getWidth: Integer;
     // function GetFPS: double;
 
-    property Enabled: Boolean Read getEnabled write setEnabled;
+    property Enabled: Boolean read getEnabled write setEnabled;
     // property Mat: TMat read getMat;
     // property Name: String read GetName;
     // property Width: Integer Read getWidth;
@@ -75,7 +76,7 @@ Type
 
   TCVReceiverList         = TThreadList<ICVDataReceiver>;
   TOnCVNotify             = procedure(Sender: TObject; const AMat: TMat) of object;
-  TOnCVNotifyVar          = procedure(Sender: TObject; Var AMat: TMat) of object;
+  TOnCVNotifyVar          = procedure(Sender: TObject; var AMat: TMat) of object;
   TOnCVAfterPaint         = TOnCVNotify;
   TOnBeforeNotifyReceiver = TOnCVNotifyVar;
 
@@ -88,7 +89,7 @@ Type
 
     function getEnabled: Boolean; virtual; abstract;
     procedure setEnabled(const Value: Boolean); virtual; abstract;
-    function getObjectName: String;
+    function getObjectName: string;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -96,7 +97,7 @@ Type
     procedure RemoveReceiver(const CVReceiver: ICVDataReceiver); virtual;
     function getMat: TMat; virtual; abstract;
   published
-    property Enabled: Boolean Read getEnabled write setEnabled default False;
+    property Enabled: Boolean read getEnabled write setEnabled default False;
     property OnBeforeNotifyReceiver: TOnBeforeNotifyReceiver read FOnBeforeNotifyReceiver write FOnBeforeNotifyReceiver;
     property OnCVNotify: TOnCVNotifyVar read FOnCVNotify write FOnCVNotify;
   end;
@@ -113,7 +114,7 @@ Type
     destructor Destroy; override;
     function isSourceEnabled: Boolean; virtual;
   published
-    property Source: ICVDataSource Read FCVSource write SetCVSource;
+    property Source: ICVDataSource read FCVSource write SetCVSource;
   end;
 
   TCVDataProxy = class(TCVDataSource, ICVDataReceiver)
@@ -127,8 +128,10 @@ Type
     procedure TakeMat(const AMat: TMat); virtual; abstract;
     destructor Destroy; override;
   published
-    property Source: ICVDataSource Read FCVSource write SetCVSource;
+    property Source: ICVDataSource read FCVSource write SetCVSource;
   end;
+
+  TCVViewPaintEngine = (peGDI, peD2D);
 
   [ComponentPlatformsAttribute(pidWin64)]
   TCVView = class(TCustomControl, ICVDataReceiver)
@@ -141,8 +144,11 @@ Type
     FOnBeforePaint: TOnCVNotify;
     FCenter: Boolean;
     FProportional: Boolean;
+    FPaintEngine: TCVViewPaintEngine;
+    FD2DCanvas: TDirect2DCanvas;
     procedure WMPaint(var Message: TWMPaint); message WM_PAINT;
     procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMSize(var Message: TWMSize); message WM_SIZE;
     procedure TakeMat(const AMat: TMat);
     procedure SetSource(const Value: TObject);
     function getMat: TMat;
@@ -151,6 +157,8 @@ Type
     procedure SetCVSource(const Value: ICVDataSource);
     procedure PaintDisignInfo;
     procedure PaintInRunTime;
+    procedure SetPaintEngine(const Value: TCVViewPaintEngine);
+    function D2DDraw(const dc: HDC; const img: TMat; const rect: System.Types.TRect): Boolean;
   protected
   public
     constructor Create(AOwner: TComponent); override;
@@ -159,11 +167,12 @@ Type
     function MatIsEmpty: Boolean;
     procedure DrawMat(const AMat: TMat);
   published
-    property Source: ICVDataSource Read FCVSource write SetCVSource;
+    property Source: ICVDataSource read FCVSource write SetCVSource;
     property Mat: TMat read getMat write setMat;
     property Proportional: Boolean read FProportional write FProportional default False;
     property Stretch: Boolean read FStretch write FStretch default True;
     property Center: Boolean read FCenter write FCenter default False;
+    property PaintEngine: TCVViewPaintEngine read FPaintEngine write SetPaintEngine;
     property Align;
     property OnAfterPaint: TOnCVAfterPaint read FOnAfterPaint write FOnAfterPaint;
     property OnBeforePaint: TOnCVNotify read FOnBeforePaint write FOnBeforePaint;
@@ -191,8 +200,8 @@ Type
     TSourceType = (stStream, stFile);
   private
     FSourceType: TSourceType;
-    FFileName: String;
-    FVideoAPIs: VideoCaptureAPIs;
+    FFileName: string;
+    FVideoAPIs: TVideoCaptureAPIs;
     FCameraIndex: Integer;
   private
     FCapture: TVideoCapture;
@@ -203,12 +212,13 @@ Type
     procedure TerminatedSet; override;
     procedure Execute; override;
   public
-    constructor Create(const AFileName: string; const AThreadDelay: Cardinal = 1000 div 25; const VideoAPIs: VideoCaptureAPIs = CAP_ANY); overload;
-    constructor Create(const ACameraIndex: Integer; const AThreadDelay: Cardinal = 1000 div 25; const VideoAPIs: VideoCaptureAPIs = CAP_ANY); overload;
+    constructor Create(const AFileName: string; const AThreadDelay: Cardinal = 1000 div 25; const VideoAPIs: TVideoCaptureAPIs = CAP_ANY); overload;
+    constructor Create(const ACameraIndex: Integer; const AThreadDelay: Cardinal = 1000 div 25;
+      const VideoAPIs: TVideoCaptureAPIs = CAP_ANY); overload;
     procedure SetResolution(const Width, Height: Double);
-    property OnNoData: TNotifyEvent Read FOnNoData write FOnNoData;
-    property OnNotifyData: TOnCVNotify Read FOnNotifyData write FOnNotifyData;
-    property ThreadDelay: Cardinal read FThreadDelay Write FThreadDelay;
+    property OnNoData: TNotifyEvent read FOnNoData write FOnNoData;
+    property OnNotifyData: TOnCVNotify read FOnNotifyData write FOnNotifyData;
+    property ThreadDelay: Cardinal read FThreadDelay write FThreadDelay;
   end;
 
   TCVCustomResolution = class(TPersistent)
@@ -224,8 +234,8 @@ Type
   end;
 
   {
-    Является родителем для источников внутри TCVCaptureSource
-  }
+    РЇРІР»СЏРµС‚СЃСЏ СЂРѕРґРёС‚РµР»РµРј РґР»СЏ РёСЃС‚РѕС‡РЅРёРєРѕРІ РІРЅСѓС‚СЂРё TCVCaptureSource
+ }
   TCVVideoCaptureAPIs = ( //
     ANY,                  // !< Auto detect == 0
     VFW,                  // !< Video For Windows (obsolete, removed)
@@ -282,9 +292,9 @@ Type
   public
     constructor Create(AOwner: TPersistent); reintroduce; virtual;
     function GetNamePath: string; override;
-    property Name;
+    property name;
   published
-    property Delay: Cardinal read FThreadDelay Write setThreadDelay default 0;
+    property Delay: Cardinal read FThreadDelay write setThreadDelay default 0;
     property CaptureAPIs: TCVVideoCaptureAPIs read FCaptureAPIs write setCaptureAPIs default ANY;
   end;
 
@@ -311,7 +321,7 @@ const
     (W: 0; H: 0)       //
     );
 
-Type
+type
 
   [ComponentPlatformsAttribute(pidWin64)]
   TCVWebCameraSource = class(TCVCustomSource)
@@ -362,42 +372,42 @@ Type
 
     FEnabled: Boolean;
 
-    // Работа со встроенным свойством
+    // Р Р°Р±РѕС‚Р° СЃРѕ РІСЃС‚СЂРѕРµРЅРЅС‹Рј СЃРІРѕР№СЃС‚РІРѕРј
     function GetPropertiesClassName: string;
     procedure SetProperties(const Value: TCVCustomSource);
     procedure SetPropertiesClassName(const Value: string);
     function GetProperties: TCVCustomSource;
     function GetPropertiesClass: TCVSourceTypeClass;
     procedure SetPropertiesClass(Value: TCVSourceTypeClass);
-    // Создение/Уничтожение/Пересоздание встроенного свойства
+    // РЎРѕР·РґРµРЅРёРµ/РЈРЅРёС‡С‚РѕР¶РµРЅРёРµ/РџРµСЂРµСЃРѕР·РґР°РЅРёРµ РІСЃС‚СЂРѕРµРЅРЅРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
     procedure CreateProperties;
     procedure DestroyProperties;
     procedure RecreateProperties;
 
-    // Вызывается после загрузки компонента
-    // Если Enabled=true - запуск потока
+    // Р’С‹Р·С‹РІР°РµС‚СЃСЏ РїРѕСЃР»Рµ Р·Р°РіСЂСѓР·РєРё РєРѕРјРїРѕРЅРµРЅС‚Р°
+    // Р•СЃР»Рё Enabled=true - Р·Р°РїСѓСЃРє РїРѕС‚РѕРєР°
     procedure Loaded; override;
 
-    // Зпуск и остановка потока
+    // Р—РїСѓСЃРє Рё РѕСЃС‚Р°РЅРѕРІРєР° РїРѕС‚РѕРєР°
     procedure setEnabled(const Value: Boolean); override;
     function getEnabled: Boolean; override;
 
-    // Пристыкуется к потоку для получения данных
+    // РџСЂРёСЃС‚С‹РєСѓРµС‚СЃСЏ Рє РїРѕС‚РѕРєСѓ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РґР°РЅРЅС‹С…
     procedure OnNotifyDataCaptureThread(Sender: TObject; const AMat: TMat);
     procedure OnNoDataCaptureThread(Sender: TObject);
     procedure OnTerminateCaptureThread(Sender: TObject);
 
-    // События от изменения параметров встроенного свойства
+    // РЎРѕР±С‹С‚РёСЏ РѕС‚ РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РІСЃС‚СЂРѕРµРЅРЅРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
     procedure OnNotifyChange(Sender: TObject);
 
-    // Для внутреннего свойства
+    // Р”Р»СЏ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ СЃРІРѕР№СЃС‚РІР°
     property SourceTypeClass: TCVSourceTypeClass read GetPropertiesClass write SetPropertiesClass;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    // Создает и запускает поток
+    // РЎРѕР·РґР°РµС‚ Рё Р·Р°РїСѓСЃРєР°РµС‚ РїРѕС‚РѕРє
     procedure StartCapture;
-    // Останавливает и уничтожает поток
+    // РћСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ Рё СѓРЅРёС‡С‚РѕР¶Р°РµС‚ РїРѕС‚РѕРє
     procedure StopCapture;
   published
     property SourceTypeClassName: string read GetPropertiesClassName write SetPropertiesClassName;
@@ -431,7 +441,7 @@ Type
     destructor Destroy; override;
     procedure TakeMat(const AMat: TMat); override;
   published
-    property Enabled: Boolean Read FEnabled write setEnabled default False;
+    property Enabled: Boolean read FEnabled write setEnabled default False;
     property OutputFileName: TFileName read FFileName write SetFileName;
     property FourCC: AnsiString read FFourCC write SetFourCC;
     property FPS: Cardinal read FFPS write setFPS default 24;
@@ -440,97 +450,38 @@ Type
     property Resolution: TCVCustomResolution read FResolution write FResolution;
   end;
 
+  [ComponentPlatformsAttribute(pidWin64)]
   TRegisteredCaptureSource = class(TStringList)
   public
-    function FindByClassName(const ClassName: String): TCVSourceTypeClass;
-    function FindByName(const Name: String): TCVSourceTypeClass;
-    function GetNameByClass(const IOClass: TClass): String;
-    procedure RegisterIOClass(const IOClass: TClass; const ClassName: String);
+    function FindByClassName(const ClassName: string): TCVSourceTypeClass;
+    function FindByName(const Name: string): TCVSourceTypeClass;
+    function GetNameByClass(const IOClass: TClass): string;
+    procedure RegisterIOClass(const IOClass: TClass; const ClassName: string);
   end;
 
 function GetRegisteredCaptureSource: TRegisteredCaptureSource;
 function CV_FOURCC(const c1, c2, c3, c4: AnsiChar): Integer; overload;
-{$IFDEF USE_INLINE}inline; {$ENDIF}
+{$IFDEF USE_INLINE}inline;
+{$ENDIF}
 function CV_FOURCC(const c: AnsiString): Integer; overload;
-{$IFDEF USE_INLINE}inline; {$ENDIF}
+{$IFDEF USE_INLINE}inline;
+{$ENDIF}
 
 implementation
 
-function ipDraw(dc: HDC; img: TMat; const rect: System.Types.TRect; const Stretch: Boolean = True): Boolean;
+uses
+  System.UITypes,
 
-Type
-  pCOLORREF         = ^COLORREF;
-  pBITMAPINFOHEADER = ^BITMAPINFOHEADER;
+  cv.utils;
 
-Var
-  // isrgb: Boolean;
-  isgray: Boolean;
-  buf: array [1 .. SizeOf(BITMAPINFOHEADER) + SizeOf(RGBQUAD) * 256] of byte;
-  dibhdr: pBITMAPINFOHEADER;
-  _dibhdr: TBitmapInfo ABSOLUTE buf;
-  _rgb: pCOLORREF;
-  i: Integer;
-  iResult: Integer;
-begin
-  if img.empty then
-    Exit(False);
-
-  // isrgb := ('R' = upcase(img^.colorModel[0])) and ('G' = upcase(img^.colorModel[1])) and ('B' = upcase(img^.colorModel[2]));
-  // isgray := 'G' = upcase(img^.colorModel[0]);
-  isgray := img.channels = 1;
-  // if (not isgray) and (not isrgb) then
-  // Exit(false);
-  // if (1 = img^.nChannels) and (not isgray) then
-  // Exit(false);
-
-  dibhdr := pBITMAPINFOHEADER(@buf);
-  _rgb := pCOLORREF(Integer(dibhdr) + SizeOf(BITMAPINFOHEADER));
-
-  if (isgray) then
-    for i := 0 to 255 do
-      _rgb[i] := rgb(i, i, i);
-
-  dibhdr^.biSize := SizeOf(BITMAPINFOHEADER);
-  dibhdr^.biWidth := img.cols;
-  // Check origin for display
-  // if img^.Origin = 0 then
-  dibhdr^.biHeight := -img.rows;
-  // else
-  // dibhdr^.biHeight := img^.Height;
-
-  dibhdr^.biPlanes := 1;
-  dibhdr^.biBitCount := 8 * img.channels;
-  dibhdr^.biCompression := BI_RGB;
-  dibhdr^.biSizeImage := 0; // img^.imageSize;
-  dibhdr^.biXPelsPerMeter := 0;
-  dibhdr^.biYPelsPerMeter := 0;
-  dibhdr^.biClrUsed := 0;
-  dibhdr^.biClrImportant := 0;
-
-  if Stretch then
-  begin
-    SetStretchBltMode(dc, COLORONCOLOR);
-    SetMapMode(dc, MM_TEXT);
-    // Stretch the image to fit the rectangle
-    iResult := StretchDIBits(dc, rect.Left, rect.Top, rect.Width, rect.Height, 0, 0, img.cols, img.rows, img.Data, _dibhdr, DIB_RGB_COLORS, SRCCOPY);
-    Result := (iResult > 0); // and (iResult <> GDI_ERROR);
-  end
-  else
-  begin
-    // Draw without scaling
-    iResult := SetDIBitsToDevice(dc, rect.Left, rect.Top, img.cols, img.rows, 0, 0, 0, img.rows, img.Data, _dibhdr, DIB_RGB_COLORS);
-    Result := (iResult > 0); // and (iResult <> GDI_ERROR);
-  end;
-end;
-
-Var
+var
   _RegisteredCaptureSource: TRegisteredCaptureSource = nil;
 
 function GetRegisteredCaptureSource: TRegisteredCaptureSource;
 begin
   if not Assigned(_RegisteredCaptureSource) then
     _RegisteredCaptureSource := TRegisteredCaptureSource.Create;
-  Result := _RegisteredCaptureSource;
+  Result                     := _RegisteredCaptureSource;
 end;
 
 { TCVDataSource }
@@ -552,13 +503,13 @@ begin
   inherited;
 end;
 
-function TCVDataSource.getObjectName: String;
+function TCVDataSource.getObjectName: string;
 begin
-  Result := Name;
+  Result := name;
 end;
 
 procedure TCVDataSource.NotifyReceiver(const AMat: TMat);
-Var
+var
   R: ICVDataReceiver;
   LockList: TList<ICVDataReceiver>;
   M: TMat;
@@ -647,9 +598,9 @@ constructor TCVView.Create(AOwner: TComponent);
 begin
   inherited;
   FComponentStyle := FComponentStyle - [csInheritable];
-  FStretch := True;
-  FProportional := False;
-  FCenter := False;
+  FStretch        := True;
+  FProportional   := False;
+  FCenter         := False;
 end;
 
 destructor TCVView.Destroy;
@@ -660,6 +611,8 @@ begin
     Dispose(FMat);
     FMat := nil;
   end;
+  if Assigned(FD2DCanvas) then
+    FreeAndNil(FD2DCanvas);
   inherited;
 end;
 
@@ -694,7 +647,7 @@ begin
   try
     Canvas.Font.Color := clWindowText;
     var
-      Text: string := Name + ': ' + ClassName;
+      Text: string := name + ': ' + ClassName;
     var
       TextOneHeight: Integer := Canvas.TextHeight(Text) + 5;
     var
@@ -702,31 +655,67 @@ begin
     if not Assigned(Source) then
       TextHeight := TextHeight + TextOneHeight;
 
-    Var
+    var
       x: Integer := (ClientWidth - Canvas.TextWidth(Text)) div 2;
-    Var
+    var
       y: Integer := (ClientHeight - TextHeight) div 2;
     Canvas.TextOut(x, y, Text);
 
     Text := '(' + ClientWidth.ToString + ',' + ClientHeight.ToString + ')';
-    x := (ClientWidth - Canvas.TextWidth(Text)) div 2;
-    y := y + TextOneHeight;
+    x    := (ClientWidth - Canvas.TextWidth(Text)) div 2;
+    y    := y + TextOneHeight;
     Canvas.TextOut(x, y, Text);
     if Assigned(Source) then
     begin
       Canvas.Font.Color := clWindowText;
-      Text := 'Source: ' + Source.getObjectName;
+      Text              := 'Source: ' + Source.getObjectName;
     end
     else
     begin
       Canvas.Font.Color := clRed;
-      Text := 'Source not defined';
+      Text              := 'Source not defined';
     end;
     x := (ClientWidth - Canvas.TextWidth(Text)) div 2;
     y := y + TextOneHeight;
     Canvas.TextOut(x, y, Text);
+
+    Text := 'Paint engine: ';
+    if PaintEngine = peGDI then
+      Text := Text + 'GDI'
+    else
+      Text            := Text + 'Direct2D';
+    x                 := (ClientWidth - Canvas.TextWidth(Text)) div 2;
+    y                 := y + TextOneHeight;
+    Canvas.Font.Color := clBlack;
+    Canvas.TextOut(x, y, Text);
   finally
     Canvas.Unlock;
+  end;
+end;
+
+function TCVView.D2DDraw(const dc: HDC; const img: TMat; const rect: System.Types.TRect): Boolean;
+begin
+  Result := not img.empty;
+  if Result then
+  begin
+    if not Assigned(FD2DCanvas) then
+      FD2DCanvas := TDirect2DCanvas.Create(dc, rect);
+    FD2DCanvas.BeginDraw;
+    try
+      var
+        B: TBitmap;
+      try
+        MatToBmp(img, B, TPixelFormat.pf24bit);
+        if Self.Stretch then
+          FD2DCanvas.StretchDraw(rect, B)
+        else
+          FD2DCanvas.Draw(0, 0, B);
+      finally
+        B.Free;
+      end;
+    finally
+      FD2DCanvas.EndDraw;
+    end;
   end;
 end;
 
@@ -734,18 +723,20 @@ procedure TCVView.PaintInRunTime;
 var
   dc: HDC;
   ps: TPaintStruct;
+  R: Boolean;
 begin
-  // Canvas.Lock;
   dc := BeginPaint(Handle, ps);
   try
     if Assigned(OnBeforePaint) then
       OnBeforePaint(Self, FMat^);
-    if ipDraw(dc { Canvas.Handle } , FMat^, PaintRect) then
-      if Assigned(OnAfterPaint) then
-        OnAfterPaint(Self, FMat^);
+    if PaintEngine = peGDI then
+      R := ipDraw(dc, FMat^, PaintRect)
+    else
+      R := D2DDraw(dc, FMat^, PaintRect);
+    if R and Assigned(OnAfterPaint) then
+      OnAfterPaint(Self, FMat^);
   finally
     EndPaint(Handle, ps);
-    // Canvas.Unlock;
   end;
 end;
 
@@ -757,10 +748,10 @@ begin
   if MatIsEmpty then
     Exit(System.Types.rect(0, 0, 0, 0));
 
-  ViewWidth := FMat.cols;
+  ViewWidth  := FMat.cols;
   ViewHeight := FMat.rows;
-  CliWidth := ClientWidth;
-  CliHeight := ClientHeight;
+  CliWidth   := ClientWidth;
+  CliHeight  := ClientHeight;
   if (Proportional and ((ViewWidth > CliWidth) or (ViewHeight > CliHeight))) or Stretch then
   begin
     if Proportional and (ViewWidth > 0) and (ViewHeight > 0) then
@@ -768,37 +759,37 @@ begin
       AspectRatio := ViewWidth / ViewHeight;
       if ViewWidth > ViewHeight then
       begin
-        ViewWidth := CliWidth;
+        ViewWidth  := CliWidth;
         ViewHeight := Trunc(CliWidth / AspectRatio);
         if ViewHeight > CliHeight then
         begin
           ViewHeight := CliHeight;
-          ViewWidth := Trunc(CliHeight * AspectRatio);
+          ViewWidth  := Trunc(CliHeight * AspectRatio);
         end;
       end
       else
       begin
         ViewHeight := CliHeight;
-        ViewWidth := Trunc(CliHeight * AspectRatio);
+        ViewWidth  := Trunc(CliHeight * AspectRatio);
         if ViewWidth > CliWidth then
         begin
-          ViewWidth := CliWidth;
+          ViewWidth  := CliWidth;
           ViewHeight := Trunc(CliWidth / AspectRatio);
         end;
       end;
     end
     else
     begin
-      ViewWidth := CliWidth;
+      ViewWidth  := CliWidth;
       ViewHeight := CliHeight;
     end;
   end;
 
   with Result do
   begin
-    Left := 0;
-    Top := 0;
-    Right := ViewWidth;
+    Left   := 0;
+    Top    := 0;
+    Right  := ViewWidth;
     Bottom := ViewHeight;
   end;
 
@@ -823,6 +814,17 @@ begin
   if not Assigned(FMat) then
     New(FMat);
   FMat^ := Value;
+end;
+
+procedure TCVView.SetPaintEngine(const Value: TCVViewPaintEngine);
+begin
+  if FPaintEngine <> Value then
+  begin
+    if TDirect2DCanvas.Supported or (Value <> peD2D) then
+      FPaintEngine := Value;
+    if (csDesigning in ComponentState) then
+      Invalidate;
+  end;
 end;
 
 procedure TCVView.SetSource(const Value: TObject);
@@ -855,10 +857,22 @@ begin
     inherited;
 end;
 
+procedure TCVView.WMSize(var Message: TWMSize);
+begin
+  if (not(csDesigning in ComponentState)) and Assigned(FD2DCanvas) then
+  begin
+    var
+      pixelSize: D2D1_SIZE_U := D2D1SizeU(Width, Height);
+    ID2D1HwndRenderTarget(FD2DCanvas.RenderTarget).Resize(pixelSize);
+  end
+  else
+    inherited;
+end;
+
 { TCVCaptureSource }
 
-Var
-  CVVideoCaptureAPIs: array [TCVVideoCaptureAPIs] of VideoCaptureAPIs = //
+var
+  CVVideoCaptureAPIs: array [TCVVideoCaptureAPIs] of TVideoCaptureAPIs = //
     ( //
     CAP_ANY,         // !< Auto detect == 0
     CAP_VFW,         // !< Video For Windows obsolete, removed)
@@ -927,7 +941,7 @@ procedure TCVCaptureSource.CreateProperties;
 begin
   if FOperationClass <> nil then
   begin
-    FOperation := FOperationClass.Create(Self);
+    FOperation                := FOperationClass.Create(Self);
     FOperation.OnNotifyChange := OnNotifyChange;
   end;
 end;
@@ -953,7 +967,7 @@ function TCVCaptureSource.GetProperties: TCVCustomSource;
 begin
   if not Assigned(FOperation) then
     FOperation := TCVWebCameraSource.Create(Self);
-  Result := FOperation;
+  Result       := FOperation;
 end;
 
 function TCVCaptureSource.GetPropertiesClass: TCVSourceTypeClass;
@@ -980,7 +994,7 @@ procedure TCVCaptureSource.OnNoDataCaptureThread(Sender: TObject);
 begin
   if FOperationClass = TCVFileSource then
   begin
-    Var
+    var
       FileSource: TCVFileSource := FOperation as TCVFileSource;
     if FileSource.Loop then
       FSourceThread.FCapture.&set(CAP_PROP_POS_FRAMES, 0);
@@ -1001,8 +1015,8 @@ end;
 
 procedure TCVCaptureSource.OnTerminateCaptureThread(Sender: TObject);
 begin
-  FreeAndNil(FSourceThread);
-  FEnabled := False;
+  FSourceThread := nil;
+  FEnabled      := False;
 end;
 
 procedure TCVCaptureSource.RecreateProperties;
@@ -1041,7 +1055,7 @@ begin
 
   if FOperationClass = TCVWebCameraSource then
   begin
-    Var
+    var
       WebCameraSource: TCVWebCameraSource := FOperation as TCVWebCameraSource;
 
     FSourceThread := TCVCaptureThread.Create( //
@@ -1057,19 +1071,19 @@ begin
   end
   else if FOperationClass = TCVFileSource then
   begin
-    Var
+    var
       FileSource: TCVFileSource := FOperation as TCVFileSource;
-    FSourceThread := TCVCaptureThread.Create( //
-      FileSource.FileName,                    //
-      FileSource.Delay,                       //
+    FSourceThread               := TCVCaptureThread.Create( //
+      FileSource.FileName, //
+      FileSource.Delay, //
       CVVideoCaptureAPIs[FileSource.CaptureAPIs]);
   end;
 
   if Assigned(FSourceThread) then
   begin
-    FSourceThread.OnNoData := OnNoDataCaptureThread;
+    FSourceThread.OnNoData     := OnNoDataCaptureThread;
     FSourceThread.OnNotifyData := OnNotifyDataCaptureThread;
-    FSourceThread.OnTerminate := OnTerminateCaptureThread;
+    FSourceThread.OnTerminate  := OnTerminateCaptureThread;
     // if OldEnabled then
     // begin
     FSourceThread.Start;
@@ -1082,42 +1096,44 @@ procedure TCVCaptureSource.StopCapture;
 begin
   if Assigned(FSourceThread) then
   begin
-    FSourceThread.OnNoData := nil;
+    FSourceThread.OnNoData     := nil;
     FSourceThread.OnNotifyData := nil;
-    FSourceThread.OnTerminate := nil;
-    FreeAndNil(FSourceThread);
+    FSourceThread.OnTerminate  := nil;
+    FSourceThread.Terminate;
+    FSourceThread := nil;
+    FEnabled      := False;
   end;
 end;
 
 { TRegisteredCaptureSource }
 
-function TRegisteredCaptureSource.FindByClassName(const ClassName: String): TCVSourceTypeClass;
-Var
+function TRegisteredCaptureSource.FindByClassName(const ClassName: string): TCVSourceTypeClass;
+var
   i: Integer;
 begin
   Result := nil;
-  for i := 0 to Count - 1 do
+  for i  := 0 to Count - 1 do
     if TCVSourceTypeClass(Objects[i]).ClassName = ClassName then
       Exit(TCVSourceTypeClass(Objects[i]));
 end;
 
-function TRegisteredCaptureSource.FindByName(const Name: String): TCVSourceTypeClass;
-Var
+function TRegisteredCaptureSource.FindByName(const Name: string): TCVSourceTypeClass;
+var
   i: Integer;
 begin
-  i := IndexOf(Name);
+  i := IndexOf(name);
   if i <> -1 then
     Result := TCVSourceTypeClass(Objects[i])
   else
-    Result := Nil;
+    Result := nil;
 end;
 
-function TRegisteredCaptureSource.GetNameByClass(const IOClass: TClass): String;
-Var
+function TRegisteredCaptureSource.GetNameByClass(const IOClass: TClass): string;
+var
   i: Integer;
 begin
   Result := '';
-  for i := 0 to Count - 1 do
+  for i  := 0 to Count - 1 do
     if Integer(Objects[i]) = Integer(IOClass) then
     begin
       Result := Self[i];
@@ -1125,7 +1141,7 @@ begin
     end;
 end;
 
-procedure TRegisteredCaptureSource.RegisterIOClass(const IOClass: TClass; const ClassName: String);
+procedure TRegisteredCaptureSource.RegisterIOClass(const IOClass: TClass; const ClassName: string);
 begin
   AddObject(ClassName, TObject(IOClass));
   RegisterClass(TPersistentClass(IOClass));
@@ -1221,8 +1237,8 @@ constructor TCVWebCameraSource.Create(AOwner: TPersistent);
 begin
   inherited;
   FCustomResolution := TCVCustomResolution.Create;
-  FResolution := r800x600;
-  FThreadDelay := 0;
+  FResolution       := r800x600;
+  FThreadDelay      := 0;
 end;
 
 destructor TCVWebCameraSource.Destroy;
@@ -1251,26 +1267,28 @@ end;
 
 { TCVCaptureThread }
 
-constructor TCVCaptureThread.Create(const AFileName: string; const AThreadDelay: Cardinal; const VideoAPIs: VideoCaptureAPIs);
+constructor TCVCaptureThread.Create(const AFileName: string; const AThreadDelay: Cardinal; const VideoAPIs: TVideoCaptureAPIs);
 begin
-  Inherited Create(True);
-  FThreadDelay := AThreadDelay;
-  FSourceType := stFile;
-  FFileName := AFileName;
-  FVideoAPIs := VideoAPIs;
+  inherited Create(True);
+  FThreadDelay    := AThreadDelay;
+  FSourceType     := stFile;
+  FFileName       := AFileName;
+  FVideoAPIs      := VideoAPIs;
+  FreeOnTerminate := True;
 end;
 
-constructor TCVCaptureThread.Create(const ACameraIndex: Integer; const AThreadDelay: Cardinal; const VideoAPIs: VideoCaptureAPIs);
+constructor TCVCaptureThread.Create(const ACameraIndex: Integer; const AThreadDelay: Cardinal; const VideoAPIs: TVideoCaptureAPIs);
 begin
-  Inherited Create(True);
-  FThreadDelay := AThreadDelay;
-  FSourceType := stStream;
-  FCameraIndex := ACameraIndex;
-  FVideoAPIs := VideoAPIs;
+  inherited Create(True);
+  FThreadDelay    := AThreadDelay;
+  FSourceType     := stStream;
+  FCameraIndex    := ACameraIndex;
+  FVideoAPIs      := VideoAPIs;
+  FreeOnTerminate := True;
 end;
 
 procedure TCVCaptureThread.Execute;
-Var
+var
   frame: TMat;
 begin
   if FSourceType = stFile then
@@ -1331,7 +1349,7 @@ begin
   if Dest is TCVCustomResolution then
     with TCVCustomResolution(Dest) do
     begin
-      FWidth := Self.FWidth;
+      FWidth  := Self.FWidth;
       FHeight := Self.FHeight;
     end
   else
@@ -1341,7 +1359,7 @@ end;
 constructor TCVCustomResolution.Create;
 begin
   inherited;
-  FWidth := 800;
+  FWidth  := 800;
   FHeight := 600;
 end;
 
@@ -1360,11 +1378,11 @@ end;
 constructor TCVVideoWriter.Create(AOwner: TComponent);
 begin
   inherited;
-  FFourCC := 'XVID';
-  FFPS := 24;
-  FisColored := True;
+  FFourCC         := 'XVID';
+  FFPS            := 24;
+  FisColored      := True;
   FSameResolution := True;
-  FResolution := TCVCustomResolution.Create;
+  FResolution     := TCVCustomResolution.Create;
 end;
 
 destructor TCVVideoWriter.Destroy;
@@ -1386,7 +1404,7 @@ begin
     if Length(FFourCC) = 4 then
       ex := CV_FOURCC(FFourCC)
     else
-      ex := -1;
+      ex     := -1;
     FEnabled := Writer.open(FFileName, ex, Int(FFPS), S, FisColored);
   end;
 end;
@@ -1415,7 +1433,7 @@ begin
 end;
 
 procedure TCVVideoWriter.SetFourCC(const Value: AnsiString);
-Var
+var
   V: AnsiString;
 begin
   if (not FEnabled) or (csDesigning in ComponentState) or (csLoading in ComponentState) then

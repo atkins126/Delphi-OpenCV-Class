@@ -27,12 +27,13 @@
 #
 
 # Project temp directory
-Test/
 
 # Delphi compiler-generated binaries (safe to delete)
 *.exe
 *.dll
 !opencv_delphi*.dll
+!/cvCheckDep/CheckCVDep.exe
+*.dsv
 *.bpl
 *.bpi
 *.dcp
@@ -58,8 +59,7 @@ Test/
 *.dsk
 
 # Delphi history and backups
-__history/
-__recovery/
+_*
 *.~*
 
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
@@ -72,7 +72,10 @@ modules/
 *.jpg
 *.png
 *.avi
+
 # opencv_delphi
+*.pb
 x64/
 .vs/
-*.pb
+opencv_delphi.tlog/
+*.xml

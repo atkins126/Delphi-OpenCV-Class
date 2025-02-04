@@ -20,6 +20,8 @@
   limitations under the License.
 *)
 
+{$IFDEF INTERFACE}
+
 {$IF not defined(OPENCV_VIDEOIO_HPP)}
 {$DEFINE OPENCV_VIDEOIO_HPP}
 
@@ -58,44 +60,45 @@ Type
     @note Backends are available only if they have been built with your OpenCV binaries.
     See @ref videoio_overview for more information.
   *)
-  VideoCaptureAPIs = (           //
-    CAP_ANY = 0,                 // !< Auto detect == 0
-    CAP_VFW = 200,               // !< Video For Windows (obsolete, removed)
-    CAP_V4L = 200,               // !< V4L/V4L2 capturing support
-    CAP_V4L2 = CAP_V4L,          // !< Same as CAP_V4L
-    CAP_FIREWIRE = 300,          // !< IEEE 1394 drivers
-    CAP_FIREWARE = CAP_FIREWIRE, // !< Same value as CAP_FIREWIRE
-    CAP_IEEE1394 = CAP_FIREWIRE, // !< Same value as CAP_FIREWIRE
-    CAP_DC1394 = CAP_FIREWIRE,   // !< Same value as CAP_FIREWIRE
-    CAP_CMU1394 = CAP_FIREWIRE,  // !< Same value as CAP_FIREWIRE
-    CAP_QT = 500,                // !< QuickTime (obsolete, removed)
-    CAP_UNICAP = 600,            // !< Unicap drivers (obsolete, removed)
-    CAP_DSHOW = 700,             // !< DirectShow (via videoInput)
-    CAP_PVAPI = 800,             // !< PvAPI, Prosilica GigE SDK
-    CAP_OPENNI = 900,            // !< OpenNI (for Kinect)
-    CAP_OPENNI_ASUS = 910,       // !< OpenNI (for Asus Xtion)
-    CAP_ANDROID = 1000,          // !< Android - not used
-    CAP_XIAPI = 1100,            // !< XIMEA Camera API
-    CAP_AVFOUNDATION = 1200,     // !< AVFoundation framework for iOS (OS X Lion will have the same API)
-    CAP_GIGANETIX = 1300,        // !< Smartek Giganetix GigEVisionSDK
-    CAP_MSMF = 1400,             // !< Microsoft Media Foundation (via videoInput)
-    CAP_WINRT = 1410,            // !< Microsoft Windows Runtime using Media Foundation
-    CAP_INTELPERC = 1500,        // !< RealSense (former Intel Perceptual Computing SDK)
-    CAP_REALSENSE = 1500,        // !< Synonym for CAP_INTELPERC
-    CAP_OPENNI2 = 1600,          // !< OpenNI2 (for Kinect)
-    CAP_OPENNI2_ASUS = 1610,     // !< OpenNI2 (for Asus Xtion and Occipital Structure sensors)
-    CAP_OPENNI2_ASTRA = 1620,    // !< OpenNI2 (for Orbbec Astra)
-    CAP_GPHOTO2 = 1700,          // !< gPhoto2 connection
-    CAP_GSTREAMER = 1800,        // !< GStreamer
-    CAP_FFMPEG = 1900,           // !< Open and record video file or stream using the FFMPEG library
-    CAP_IMAGES = 2000,           // !< OpenCV Image Sequence (e.g. img_%02d.jpg)
-    CAP_ARAVIS = 2100,           // !< Aravis SDK
-    CAP_OPENCV_MJPEG = 2200,     // !< Built-in OpenCV MotionJPEG codec
-    CAP_INTEL_MFX = 2300,        // !< Intel MediaSDK
-    CAP_XINE = 2400,             // !< XINE engine (Linux)
-    CAP_UEYE = 2500              // !< uEye Camera API
-    );
+  TVideoCaptureAPIs = type int;           //
+const
+    CAP_ANY = 0;                 // !< Auto detect == 0
+    CAP_VFW = 200;               // !< Video For Windows (obsolete; removed)
+    CAP_V4L = 200;               // !< V4L/V4L2 capturing support
+    CAP_V4L2 = CAP_V4L;          // !< Same as CAP_V4L
+    CAP_FIREWIRE = 300;          // !< IEEE 1394 drivers
+    CAP_FIREWARE = CAP_FIREWIRE; // !< Same value as CAP_FIREWIRE
+    CAP_IEEE1394 = CAP_FIREWIRE; // !< Same value as CAP_FIREWIRE
+    CAP_DC1394 = CAP_FIREWIRE;   // !< Same value as CAP_FIREWIRE
+    CAP_CMU1394 = CAP_FIREWIRE;  // !< Same value as CAP_FIREWIRE
+    CAP_QT = 500;                // !< QuickTime (obsolete; removed)
+    CAP_UNICAP = 600;            // !< Unicap drivers (obsolete; removed)
+    CAP_DSHOW = 700;             // !< DirectShow (via videoInput)
+    CAP_PVAPI = 800;             // !< PvAPI; Prosilica GigE SDK
+    CAP_OPENNI = 900;            // !< OpenNI (for Kinect)
+    CAP_OPENNI_ASUS = 910;       // !< OpenNI (for Asus Xtion)
+    CAP_ANDROID = 1000;          // !< Android - not used
+    CAP_XIAPI = 1100;            // !< XIMEA Camera API
+    CAP_AVFOUNDATION = 1200;     // !< AVFoundation framework for iOS (OS X Lion will have the same API)
+    CAP_GIGANETIX = 1300;        // !< Smartek Giganetix GigEVisionSDK
+    CAP_MSMF = 1400;             // !< Microsoft Media Foundation (via videoInput)
+    CAP_WINRT = 1410;            // !< Microsoft Windows Runtime using Media Foundation
+    CAP_INTELPERC = 1500;        // !< RealSense (former Intel Perceptual Computing SDK)
+    CAP_REALSENSE = 1500;        // !< Synonym for CAP_INTELPERC
+    CAP_OPENNI2 = 1600;          // !< OpenNI2 (for Kinect)
+    CAP_OPENNI2_ASUS = 1610;     // !< OpenNI2 (for Asus Xtion and Occipital Structure sensors)
+    CAP_OPENNI2_ASTRA = 1620;    // !< OpenNI2 (for Orbbec Astra)
+    CAP_GPHOTO2 = 1700;          // !< gPhoto2 connection
+    CAP_GSTREAMER = 1800;        // !< GStreamer
+    CAP_FFMPEG = 1900;           // !< Open and record video file or stream using the FFMPEG library
+    CAP_IMAGES = 2000;           // !< OpenCV Image Sequence (e.g. img_%02d.jpg)
+    CAP_ARAVIS = 2100;           // !< Aravis SDK
+    CAP_OPENCV_MJPEG = 2200;     // !< Built-in OpenCV MotionJPEG codec
+    CAP_INTEL_MFX = 2300;        // !< Intel MediaSDK
+    CAP_XINE = 2400;             // !< XINE engine (Linux)
+    CAP_UEYE = 2500;              // !< uEye Camera API
 
+Type
   (* * @brief cv::VideoCapture generic properties identifier.
 
     Reading / writing properties involves many layers. Some unexpected result might happens along this chain.
@@ -676,7 +679,7 @@ Type
     *)
     // CV_WRAP explicit VideoCapture(int index, int apiPreference = CAP_ANY);
     class operator Implicit(const index: Int): TVideoCapture; {$IFDEF USE_INLINE}inline; {$ENDIF}
-    class function Capture(const index:int; const apiPreference :VideoCaptureAPIs = CAP_ANY):TVideoCapture; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    class function Capture(const index:int; const apiPreference : TVideoCaptureAPIs = CAP_ANY):TVideoCapture; static; {$IFDEF USE_INLINE}inline; {$ENDIF}
     (* @overload
       @brief Opens a camera for video capturing with API Preference and parameters
 
@@ -702,7 +705,7 @@ Type
       The method first calls VideoCapture::release to close the already opened file or camera.
     *)
     // CV_WRAP virtual Bool open(const String & filename, int apiPreference = CAP_ANY);
-    function open(const filename: String; const apiPreference: VideoCaptureAPIs = CAP_ANY): BOOL; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    function open(const filename: String; const apiPreference: TVideoCaptureAPIs = CAP_ANY): BOOL; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
     (* @brief  Opens a camera for video capturing
 
       @overload
@@ -715,7 +718,7 @@ Type
       The method first calls VideoCapture::release to close the already opened file or camera.
     *)
     // CV_WRAP virtual Bool open(const String & filename, int apiPreference, const std: : vector<int> & params);
-    function open(const filename: String; const apiPreference: VideoCaptureAPIs { = CAP_ANY }; const params: Vector<Int>): BOOL; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    function open(const filename: String; const apiPreference: TVideoCaptureAPIs { = CAP_ANY }; const params: Vector<Int>): BOOL; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
     (* @brief  Opens a camera for video capturing
 
       @overload
@@ -726,7 +729,7 @@ Type
       The method first calls VideoCapture::release to close the already opened file or camera.
     *)
     // CV_WRAP virtual Bool open(int index, int apiPreference = CAP_ANY);
-    function open(const index: Int; const apiPreference: VideoCaptureAPIs = CAP_ANY): BOOL; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    function open(const index: Int; const apiPreference: TVideoCaptureAPIs = CAP_ANY): BOOL; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
     (* @brief Returns true if video capturing has been initialized already.
 
       @overload
@@ -739,7 +742,7 @@ Type
       The method first calls VideoCapture::release to close the already opened file or camera.
     *)
     // CV_WRAP virtual Bool open(int index, int apiPreference, const std: : vector<int> & params);
-    function open(const index: Int; const apiPreference: VideoCaptureAPIs; const params:vector<int>): BOOL; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
+    function open(const index: Int; const apiPreference: TVideoCaptureAPIs; const params:vector<int>): BOOL; overload; {$IFDEF USE_INLINE}inline; {$ENDIF}
 
     (* @brief Returns true if video capturing has been initialized already.
 
@@ -1074,3 +1077,215 @@ Type
 
 
 {$IFEND OPENCV_VIDEOIO_HPP}
+
+{$ENDIF INTERFACE}
+
+// ===========================================================================
+
+{$IFDEF IMPLEMENTATION}
+
+{$IF defined(OPENCV_VIDEOIO_HPP) and (not defined(OPENCV_VIDEOIO_HPP_IMPL))}
+{$DEFINE OPENCV_VIDEOIO_HPP_IMPL}
+{ TVideoCapture }
+
+function TVideoCapture.&set(propId: VideoCaptureProperties; Value: double): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_set(Self, Int(propId), Value);
+{$IFEND}
+end;
+
+class operator TVideoCapture.assign(var Dest: TVideoCapture; const [ref] Src: TVideoCapture);
+begin
+  Move(Src, Dest, SizeOf(Dest));
+  if Src.isOpened then
+    FillChar((@Src.Dummy)^, SizeOf(Dest.Dummy), 0);
+end;
+
+class operator TVideoCapture.Finalize(var Dest: TVideoCapture);
+begin
+{$IF not defined(PACKAGE)}
+  destructor_CV_VIDEOCAPTURE(Dest);
+{$IFEND}
+end;
+
+function TVideoCapture.get(propId: VideoCaptureProperties): double;
+begin
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_get(Self, Int(propId));
+{$IFEND}
+end;
+
+class operator TVideoCapture.Implicit(const filename: string): TVideoCapture;
+begin
+  Result.open(filename);
+end;
+
+class operator TVideoCapture.GreaterThan(const VideoCapture: TVideoCapture; var frame: TMat): BOOL;
+begin
+  Result := VideoCapture.read(frame);
+end;
+
+class operator TVideoCapture.Implicit(const index: Int): TVideoCapture;
+begin
+  Result.open(index);
+end;
+
+class function TVideoCapture.Capture(const index: Int; const apiPreference: TVideoCaptureAPIs = CAP_ANY): TVideoCapture;
+begin
+  Result.open(index, apiPreference);
+end;
+
+class operator TVideoCapture.Initialize(out Dest: TVideoCapture);
+begin
+{$IF not defined(PACKAGE)}
+  constructor_CV_VIDEOCAPTURE_5(Dest);
+{$IFEND}
+end;
+
+function TVideoCapture.isOpened: BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_isOpened(Self);
+{$IFEND}
+end;
+
+function TVideoCapture.open(const filename: String; const apiPreference: TVideoCaptureAPIs; const params: Vector<Int>): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  try
+    Result := class_func_CV_VIDEOCAPTURE_open_1(Self, filename, Int(apiPreference), params);
+  except
+    Result := False;
+  end;
+{$IFEND}
+end;
+
+function TVideoCapture.open(const filename: String; const apiPreference: TVideoCaptureAPIs): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  try
+    Result := class_func_CV_VIDEOCAPTURE_open(Self, filename, Int(apiPreference));
+  except
+    Result := False;
+  end;
+{$IFEND}
+end;
+
+function TVideoCapture.open(const index: Int; const apiPreference: TVideoCaptureAPIs; const params: Vector<Int>): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  try
+    Result := class_func_CV_VIDEOCAPTURE_open_3(Self, index, Int(apiPreference), params);
+  except
+    Result := False;
+  end;
+{$IFEND}
+end;
+
+function TVideoCapture.open(const index: Int; const apiPreference: TVideoCaptureAPIs): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  try
+    Result := class_func_CV_VIDEOCAPTURE_open_2(Self, index, Int(apiPreference));
+  except
+    Result := False;
+  end;
+{$IFEND}
+end;
+
+function TVideoCapture.read(const image: TOutputArray): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_read(Self, image);
+{$IFEND}
+end;
+
+function TVideoCapture.grab(): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_grab(Self);
+{$IFEND}
+end;
+
+function TVideoCapture.retrieve(const image: TOutputArray; flag: Int = 0): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOCAPTURE_retrieve(Self, image, flag);
+{$IFEND}
+end;
+
+procedure TVideoCapture.release;
+begin
+{$IF not defined(PACKAGE)}
+  class_proc_CV_VIDEOCAPTURE_release(Self);
+{$IFEND}
+end;
+
+{ TVideoWriter }
+
+class operator TVideoWriter.assign(var Dest: TVideoWriter; const [ref] Src: TVideoWriter);
+begin
+  Move(Src, Dest, SizeOf(Dest));
+  if Src.isOpened then
+    FillChar((@Src.Dummy)^, SizeOf(Dest.Dummy), 0);
+end;
+
+class operator TVideoWriter.Finalize(var Dest: TVideoWriter);
+begin
+{$IF not defined(PACKAGE)}
+  destructor_CV_VIDEOWRITER(Dest);
+{$IFEND}
+end;
+
+class operator TVideoWriter.LessThan(const VideoWriter: TVideoWriter; const frame: TMat): BOOL;
+begin
+  VideoWriter.write(frame);
+  Result := true;
+end;
+
+class operator TVideoWriter.Initialize(out Dest: TVideoWriter);
+begin
+{$IF not defined(PACKAGE)}
+  constructor_CV_VIDEOWRITER_5(Dest);
+{$IFEND}
+end;
+
+function TVideoWriter.isOpened: BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOWRITER_isOpened(Self);
+{$IFEND}
+end;
+
+function TVideoWriter.open(const filename: String; fourcc: Int; fps: double; const frameSize: TSize; isColor: BOOL): BOOL;
+begin
+{$IF not defined(PACKAGE)}
+  Result := class_func_CV_VIDEOWRITER_open_3(Self, filename, fourcc, fps, frameSize, isColor);
+{$IFEND}
+end;
+
+procedure TVideoWriter.release;
+begin
+{$IF not defined(PACKAGE)}
+  class_proc_CV_VIDEOWRITER_release(Self);
+{$IFEND}
+end;
+
+procedure TVideoWriter.write(const image: TInputArray);
+begin
+{$IF not defined(PACKAGE)}
+  class_proc_CV_VIDEOWRITER_write(Self, image);
+{$IFEND}
+end;
+
+{$IFEND}
+
+{$ENDIF IMPLEMENTATION}
+
+// ============================================================================
+
+{$IFDEF INITIALIZATION}
+
+
+{$ENDIF IINITIALIZATION}
